@@ -4,7 +4,9 @@ import {
   LayoutDashboard, 
   FolderGit2, 
   Network, 
-  Mail 
+  Mail,
+  LineChart,
+  TerminalSquare
 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { clsx } from 'clsx';
@@ -14,7 +16,9 @@ const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
   { name: 'Projects', path: '/projects', icon: FolderGit2 },
   { name: 'Architecture', path: '/architecture', icon: Network },
+  { name: 'Analytics', path: '/analytics', icon: LineChart },
   { name: 'GitHub', path: '/github', icon: FaGithub },
+  { name: 'Developer Console', path: '/console', icon: TerminalSquare },
   { name: 'Contact', path: '/contact', icon: Mail },
 ];
 
