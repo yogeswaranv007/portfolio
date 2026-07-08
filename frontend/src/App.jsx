@@ -8,6 +8,7 @@ const ProjectsListView = lazy(() => import('./pages/ProjectsListView').then(modu
 const ProjectDetailView = lazy(() => import('./pages/ProjectDetailView').then(module => ({ default: module.ProjectDetailView })));
 const ArchitectureView = lazy(() => import('./pages/ArchitectureView').then(module => ({ default: module.default })));
 const ContactView = lazy(() => import('./pages/ContactView').then(module => ({ default: module.default })));
+const GithubDashboardView = lazy(() => import('./pages/GithubDashboardView').then(module => ({ default: module.default })));
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="projects" element={<ProjectsListView />} />
             <Route path="projects/:id" element={<ProjectDetailView />} />
             <Route path="architecture" element={<ArchitectureView />} />
+            <Route path="github" element={<GithubDashboardView />} />
             <Route path="contact" element={<ContactView />} />
             <Route path="*" element={<DashboardView />} /> {/* Simple 404 Fallback */}
           </Route>
