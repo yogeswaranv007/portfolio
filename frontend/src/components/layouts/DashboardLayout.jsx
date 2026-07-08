@@ -1,44 +1,48 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
+import { Footer } from '../common/Footer';
 import { Menu, X } from 'lucide-react';
 
 export function DashboardLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-text flex">
-      {/* Desktop Sidebar */}
-      <Sidebar className="hidden md:flex fixed left-0 top-0" />
-
+    <div className="flex h-screen bg-background overflow-hidden selection:bg-primary/30">
       {/* Mobile Sidebar Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-64 bg-background border-r border-borders shadow-xl z-50">
-            <Sidebar />
-          </div>
-        </div>
-      )}
+      <div 
+        className={`fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
 
-      <main className="flex-1 md:ml-64 flex flex-col min-h-screen">
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 transform lg:transform-none lg:static transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <Sidebar className="w-72 lg:w-64 border-r border-borders bg-background/95" />
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between p-4 border-b border-borders/50 bg-background/50 backdrop-blur-md sticky top-0 z-30">
-          <h1 className="text-lg font-bold tracking-tight text-text">
-            Yogeswaran<span className="text-primary">.dev</span>
-          </h1>
+        <header className="lg:hidden flex items-center justify-between p-4 border-b border-borders bg-background/50 backdrop-blur-md sticky top-0 z-30">
+          <h1 className="text-lg font-bold text-text">Yogeswaran<span className="text-primary">.dev</span></h1>
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 -mr-2 text-text/70 hover:text-text hover:bg-cards rounded-lg transition-colors"
+            className="p-2 -mr-2 text-text/70 hover:text-text transition-colors"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </header>
 
-        <div className="p-4 md:p-10 max-w-7xl mx-auto w-full flex-1">
-          <Outlet />
-        </div>
-      </main>
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 lg:p-12 scroll-smooth">
+          <div className="max-w-6xl mx-auto flex flex-col min-h-full">
+            <div className="flex-1">
+              <Outlet />
+            </div>
+            <Footer />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

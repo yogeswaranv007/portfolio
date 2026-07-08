@@ -16,9 +16,6 @@ const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
   { name: 'Projects', path: '/projects', icon: FolderGit2 },
   { name: 'Architecture', path: '/architecture', icon: Network },
-  { name: 'Analytics', path: '/analytics', icon: LineChart },
-  { name: 'GitHub', path: '/github', icon: FaGithub },
-  { name: 'Developer Console', path: '/console', icon: TerminalSquare },
   { name: 'Contact', path: '/contact', icon: Mail },
 ];
 
@@ -55,7 +52,15 @@ export function Sidebar({ className = '' }) {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-borders/50">
+      <div className="p-4 border-t border-borders/50 space-y-4">
+        <a 
+          href="/resume.pdf" 
+          target="_blank" 
+          rel="noreferrer"
+          className="flex items-center justify-center gap-2 w-full px-3 py-2.5 bg-primary/10 hover:bg-primary text-primary hover:text-white transition-colors rounded-lg text-sm font-medium"
+        >
+          View Resume
+        </a>
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-cards border border-borders/50">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-xs text-text/70 font-medium">System Online</span>

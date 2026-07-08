@@ -1,20 +1,29 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
-import { DashboardView } from './pages/DashboardView';
-import { ProjectsListView } from './pages/ProjectsListView';
-import { ProjectDetailView } from './pages/ProjectDetailView';
+import { LoadingSpinner } from './components/ui/LoadingSpinner';
+
+const DashboardView = lazy(() => import('./pages/DashboardView').then(module => ({ default: module.DashboardView })));
+const ProjectsListView = lazy(() => import('./pages/ProjectsListView').then(module => ({ default: module.ProjectsListView })));
+const ProjectDetailView = lazy(() => import('./pages/ProjectDetailView').then(module => ({ default: module.ProjectDetailView })));
+const ArchitectureView = lazy(() => import('./pages/ArchitectureView').then(module => ({ default: module.default })));
+const ContactView = lazy(() => import('./pages/ContactView').then(module => ({ default: module.default })));
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<DashboardLayout />}>
-          <Route index element={<DashboardView />} />
-          <Route path="projects" element={<ProjectsListView />} />
-          <Route path="projects/:id" element={<ProjectDetailView />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<DashboardLayout />}>
+            <Route index element={<DashboardView />} />
+            <Route path="projects" element={<ProjectsListView />} />
+            <Route path="projects/:id" element={<ProjectDetailView />} />
+            <Route path="architecture" element={<ArchitectureView />} />
+            <Route path="contact" element={<ContactView />} />
+            <Route path="*" element={<DashboardView />} /> {/* Simple 404 Fallback */}
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

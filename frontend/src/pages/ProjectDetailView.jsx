@@ -3,7 +3,7 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import projectsData from '../data/projects.json';
 import { ArchitectureDiagram } from '../components/projects/ArchitectureDiagram';
-import { ArrowLeft, ExternalLink, Github, CheckCircle2, AlertTriangle, Lightbulb } from 'lucide-react';
+import { ArrowLeft, ExternalLink, CheckCircle2, AlertTriangle, Lightbulb } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 
 export function ProjectDetailView() {

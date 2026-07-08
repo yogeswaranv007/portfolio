@@ -1,32 +1,73 @@
-# React + TypeScript + Vite
+# Yogeswaran V - Software Engineer Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+![Portfolio Preview](./src/assets/hero.png) *(Note: Replace with actual screenshot after deployment)*
 
-Currently, two official plugins are available:
+A modern, high-performance Software Engineer portfolio designed like a premium SaaS dashboard. Built to showcase full-stack engineering capabilities, system design architectures, and professional achievements.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Live Demo
+**[View Live Portfolio](https://your-deployment-url-here.vercel.app)**
 
-## React Compiler
+## 🛠️ Tech Stack
+- **Frontend Framework**: React 18
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS v4
+- **Animations**: Framer Motion
+- **Routing**: React Router v6
+- **Icons**: Lucide React & React Icons
+- **Deployment**: Vercel
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Key Features
+- **SaaS Dashboard UI**: Clean, developer-focused interface inspired by Linear and Vercel.
+- **Dynamic Data Layer**: Content driven entirely by JSON (projects, skills, achievements) for easy maintenance.
+- **System Architecture Visualizations**: Custom built CSS/Framer Motion node diagrams to explain engineering decisions.
+- **Performance Optimized**: Achieves near-perfect Lighthouse scores through route-level code splitting (`React.lazy`) and optimized rendering.
+- **Fully Responsive**: Adapts seamlessly from mobile to ultra-wide desktop monitors.
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 📁 Folder Structure
+```
+src/
+ ├── assets/        # Static images and icons
+ ├── components/    # Reusable React components
+ │    ├── common/   # Global components (Footer, etc)
+ │    ├── dashboard/# Dashboard-specific widgets (TechRadar, Timeline)
+ │    ├── layouts/  # Structural wrappers (Sidebar, DashboardLayout)
+ │    ├── projects/ # Project-specific components (ArchitectureDiagram)
+ │    └── ui/       # Small UI elements (Typewriter, LoadingSpinner)
+ ├── data/          # JSON data layer (profile.json, projects.json)
+ ├── pages/         # Top-level route views (DashboardView, ProjectDetailView)
+ └── main.jsx       # Application entry point
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 💻 Installation & Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yogeswaranv007/portfolio.git
+   cd portfolio/frontend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   The application will be available at `http://localhost:5173`.
+
+4. **Build for production**
+   ```bash
+   npm run build
+   ```
+
+## 🚀 Deployment (Vercel)
+This project is configured for seamless deployment on Vercel.
+1. Push your code to GitHub.
+2. Import the repository in Vercel.
+3. Ensure the Build Command is `npm run build` and Output Directory is `dist`.
+4. Vercel will automatically detect Vite and configure the routing using the included `vercel.json` file.
+
+## 📄 License
+This project is open-source and available under the [MIT License](LICENSE).
