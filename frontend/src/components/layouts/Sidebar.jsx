@@ -5,10 +5,10 @@ import {
   FolderGit2, 
   Network, 
   LineChart, 
-  Github, 
   TerminalSquare, 
   Mail 
 } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -17,7 +17,7 @@ const navItems = [
   { name: 'Projects', path: '/projects', icon: FolderGit2 },
   { name: 'Architecture', path: '/architecture', icon: Network },
   { name: 'Analytics', path: '/analytics', icon: LineChart },
-  { name: 'GitHub', path: '/github', icon: Github },
+  { name: 'GitHub', path: '/github', icon: FaGithub },
   { name: 'Developer Console', path: '/console', icon: TerminalSquare },
   { name: 'Contact', path: '/contact', icon: Mail },
 ];

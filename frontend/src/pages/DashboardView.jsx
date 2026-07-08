@@ -19,48 +19,27 @@ export function DashboardView() {
     <div className="space-y-20 pb-20">
       <Hero />
 
-      {/* Quick Stats & Current Focus */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="glass-card p-6 flex flex-col gap-4 lg:col-span-1"
-        >
-          <div className="flex items-center gap-3 text-primary">
-            <Terminal className="w-6 h-6" />
-            <h2 className="text-lg font-semibold">Now Building</h2>
-          </div>
-          <ul className="space-y-3 text-sm text-text/80 mt-2">
-            {profileData.currentFocus.map((focus, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="text-primary/50 mt-0.5">▹</span>
-                {focus}
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-
-        {/* GitHub Stats Placeholder */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="glass-card p-6 flex flex-col gap-4 lg:col-span-2 relative overflow-hidden group"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-background to-transparent z-10 hidden md:block w-1/3" />
-          <div className="flex items-center justify-between z-20">
-            <div className="flex items-center gap-3 text-text">
-              <FolderGit2 className="w-6 h-6 text-secondary" />
-              <h2 className="text-lg font-semibold">Live GitHub Activity</h2>
-            </div>
-            <span className="text-xs font-mono px-2 py-1 bg-background/50 rounded text-text/50 border border-borders/50">Fetching from API...</span>
-          </div>
-          <div className="flex-1 flex items-center justify-center border border-dashed border-borders/50 rounded-lg bg-background/30 z-20 min-h-[120px]">
-            <p className="text-text/40 text-sm font-medium">Backend Integration Pending (Phase 5)</p>
-          </div>
-        </motion.div>
+      {/* Quick Statistics */}
+      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {[
+          { label: 'Major Projects', value: '5+' },
+          { label: 'LeetCode Problems', value: '400+' },
+          { label: 'Statathon', value: 'Top 25' },
+          { label: 'HackSagon', value: 'Finalist' },
+          { label: 'Stack', value: 'Java / React' },
+        ].map((stat, idx) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.1 }}
+            className="glass-card p-4 flex flex-col justify-center items-center text-center gap-1 hover:border-primary/50 transition-colors"
+          >
+            <span className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{stat.value}</span>
+            <span className="text-xs text-text/70 uppercase tracking-wider font-semibold">{stat.label}</span>
+          </motion.div>
+        ))}
       </section>
 
       <TechRadar />

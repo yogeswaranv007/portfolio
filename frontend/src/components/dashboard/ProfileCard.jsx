@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Github, Code2, Terminal } from 'lucide-react';
+import { Code2, Terminal } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa';
 
 const iconMap = {
-  github: Github,
+  github: FaGithub,
   code: Code2,
   terminal: Terminal
 };
