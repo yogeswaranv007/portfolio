@@ -1,0 +1,7 @@
+{
+  "Languages": ["Java", "C", "JavaScript"],
+  "Backend": ["Spring Boot", "REST APIs", "Node.js", "JWT", "OAuth"],
+  "Frontend": ["React", "Tailwind CSS", "HTML", "CSS"],
+  "Database": ["MySQL"],
+  "Tools": ["Git", "GitHub", "VS Code", "Figma", "Maven"]
+}
