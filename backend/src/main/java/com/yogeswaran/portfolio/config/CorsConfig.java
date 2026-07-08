@@ -10,9 +10,9 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173", "http://localhost:3000") // allow Vite dev servers
+                .allowedOriginPatterns("*") // Allow Vercel and local
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(false); // Must be false when using wildcard patterns in some Spring versions, or we can just keep it if needed. Actually with allowedOriginPatterns, allowCredentials(true) is allowed. Let's keep it false for public API.
     }
 }
