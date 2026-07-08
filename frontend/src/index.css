@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2563EB;
+  --color-secondary: #38BDF8;
+  --color-accent: #06B6D4;
+  --color-background: #09090B;
+  --color-cards: #18181B;
+  --color-text: #FAFAFA;
+  --color-borders: #27272A;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text antialiased selection:bg-primary/30;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-borders);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Glassmorphism utility classes */
+@layer utilities {
+  .glass {
+    @apply bg-cards/60 backdrop-blur-md border border-borders/50;
+  }
+  .glass-card {
+    @apply bg-cards/80 backdrop-blur-xl border border-borders rounded-xl shadow-lg;
+  }
+}
