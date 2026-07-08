@@ -37,6 +37,7 @@ export function Sidebar({ className = '' }) {
           <NavLink
             key={item.name}
             to={item.path}
+            end={item.path === '/'}
             className={({ isActive }) =>
               twMerge(
                 clsx(

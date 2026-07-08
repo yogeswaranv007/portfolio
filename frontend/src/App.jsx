@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
 import { DashboardView } from './pages/DashboardView';
+import { ProjectsListView } from './pages/ProjectsListView';
+import { ProjectDetailView } from './pages/ProjectDetailView';
 
 function App() {
   return (
@@ -9,7 +11,8 @@ function App() {
       <Routes>
         <Route path="/" element={<DashboardLayout />}>
           <Route index element={<DashboardView />} />
-          {/* We'll add more routes incrementally */}
+          <Route path="projects" element={<ProjectsListView />} />
+          <Route path="projects/:id" element={<ProjectDetailView />} />
         </Route>
       </Routes>
     </BrowserRouter>
