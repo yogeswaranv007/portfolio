@@ -73,7 +73,11 @@ export function Hero() {
       >
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-2xl -rotate-6 transition-transform group-hover:-rotate-3" />
         <div className="absolute inset-0 bg-cards border border-borders rounded-2xl flex items-center justify-center overflow-hidden z-10">
-          <span className="text-text/50 font-medium tracking-widest uppercase">Professional Image</span>
+          <img 
+            src="/yoges wp profile.png" 
+            alt="Yogeswaran V" 
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 grayscale hover:grayscale-0"
+          />
         </div>
       </motion.div>
     </section>
