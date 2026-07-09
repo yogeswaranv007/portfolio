@@ -1,12 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Loader2 } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
+import toast, { Toaster } from 'react-hot-toast';
 import profileData from '../data/profile.json';
+import { submitContactForm } from '../services/contactService';
 
 export default function ContactView() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please provide a valid email';
+    }
+    if (!formData.message.trim()) newErrors.message = 'Message is required';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error for the field when typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    try {
+      await submitContactForm(formData);
+      toast.success('Your message has been sent successfully!', {
+        duration: 4000,
+        position: 'bottom-center',
+      });
+      // Reset form on success
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      if (error.response?.status === 400 && error.response?.data?.details) {
+        // Backend validation errors
+        setErrors(error.response.data.details);
+        toast.error('Please fix the errors in the form.');
+      } else {
+        toast.error('Failed to send message. Please try again later.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-12 pb-20 max-w-4xl">
+      <Toaster />
       <div className="space-y-4">
         <motion.h1 
           initial={{ opacity: 0, y: 10 }}
@@ -68,22 +129,77 @@ export default function ContactView() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
           className="glass-card p-6 md:p-8 space-y-6"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit}
         >
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-text/90">Name</label>
-            <input type="text" className="w-full p-3 rounded-lg bg-background border border-borders text-text focus:outline-none focus:border-primary transition-colors" placeholder="John Doe" />
+            <label className="text-sm font-semibold text-text/90">Name <span className="text-red-500">*</span></label>
+            <input 
+              type="text" 
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              className={`w-full p-3 rounded-lg bg-background border ${errors.name ? 'border-red-500' : 'border-borders'} text-text focus:outline-none focus:border-primary transition-colors`} 
+              placeholder="John Doe" 
+            />
+            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
           </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-text/90">Email</label>
-            <input type="email" className="w-full p-3 rounded-lg bg-background border border-borders text-text focus:outline-none focus:border-primary transition-colors" placeholder="john@example.com" />
+            <label className="text-sm font-semibold text-text/90">Email <span className="text-red-500">*</span></label>
+            <input 
+              type="email" 
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              className={`w-full p-3 rounded-lg bg-background border ${errors.email ? 'border-red-500' : 'border-borders'} text-text focus:outline-none focus:border-primary transition-colors`} 
+              placeholder="john@example.com" 
+            />
+            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
           </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-text/90">Message</label>
-            <textarea rows="4" className="w-full p-3 rounded-lg bg-background border border-borders text-text focus:outline-none focus:border-primary transition-colors resize-none" placeholder="Hello Yogeswaran..."></textarea>
+            <label className="text-sm font-semibold text-text/90">Subject</label>
+            <input 
+              type="text" 
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              className={`w-full p-3 rounded-lg bg-background border ${errors.subject ? 'border-red-500' : 'border-borders'} text-text focus:outline-none focus:border-primary transition-colors`} 
+              placeholder="Job Opportunity" 
+            />
+            {errors.subject && <p className="text-xs text-red-500 mt-1">{errors.subject}</p>}
           </div>
-          <button type="button" className="w-full py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-colors">
-            Send Message
+
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-text/90">Message <span className="text-red-500">*</span></label>
+            <textarea 
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              rows="4" 
+              className={`w-full p-3 rounded-lg bg-background border ${errors.message ? 'border-red-500' : 'border-borders'} text-text focus:outline-none focus:border-primary transition-colors resize-none`} 
+              placeholder="Hello Yogeswaran..."
+            />
+            {errors.message && <p className="text-xs text-red-500 mt-1">{errors.message}</p>}
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full py-3 bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex justify-center items-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              'Send Message'
+            )}
           </button>
         </motion.form>
       </div>
