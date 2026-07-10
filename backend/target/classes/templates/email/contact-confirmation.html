@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thank You for Reaching Out</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { color: #2d3748; }
+        .links a { color: #3182ce; text-decoration: none; margin-right: 15px; font-weight: 500; }
+        .links a:hover { text-decoration: underline; }
+        .footer { margin-top: 30px; font-size: 14px; color: #718096; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Hello <span th:text="${name}"></span>,</h2>
+        
+        <p>Thank you for reaching out through my portfolio website! This is an automated email just to confirm that I have received your message.</p>
+        
+        <p>I read all messages and will do my best to get back to you within 24-48 hours.</p>
+        
+        <div class="footer">
+            <p>Best regards,</p>
+            <p style="font-weight: bold; color: #2d3748; margin-bottom: 5px;">Yogeswaran V</p>
+            <p style="margin-top: 0;">Software Engineer</p>
+            
+            <div class="links">
+                <a href="https://github.com/yogeswaranv007">GitHub Profile</a>
+                <a href="https://portfolio-yogeswaran-v-2005.onrender.com">Portfolio</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

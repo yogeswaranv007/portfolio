@@ -46,8 +46,8 @@ export default function ContactView() {
     setIsSubmitting(true);
     try {
       await submitContactForm(formData);
-      toast.success('Your message has been sent successfully!', {
-        duration: 4000,
+      toast.success('Thank you! Your message has been received successfully. A confirmation email has been sent.', {
+        duration: 5000,
         position: 'bottom-center',
       });
       // Reset form on success
