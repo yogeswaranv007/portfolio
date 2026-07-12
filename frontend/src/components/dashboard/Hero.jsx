@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, ArrowRight, Code2, Mail } from 'lucide-react';
+import { Download, ArrowRight, Code2, Mail, FileText } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import profileData from '../../data/profile.json';
 import { Typewriter } from '../ui/Typewriter';
+import { resumeService } from '../../services/resumeService';
 
 export function Hero() {
   return (
@@ -50,9 +51,23 @@ export function Hero() {
           <a href="/projects" className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
             View Projects <ArrowRight className="w-4 h-4" />
           </a>
-          <a href={profileData.resumeUrl} className="flex items-center gap-2 px-6 py-3 bg-cards border border-borders hover:bg-borders/50 text-text font-medium rounded-lg transition-colors">
-            <Download className="w-4 h-4" /> Resume
-          </a>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => resumeService.viewResume()} 
+              className="flex items-center gap-2 px-6 py-3 bg-cards border border-borders hover:bg-borders/50 text-text font-medium rounded-lg transition-colors"
+              aria-label="View Resume"
+            >
+              <FileText className="w-4 h-4" /> View Resume
+            </button>
+            <button 
+              onClick={() => resumeService.downloadResume()} 
+              className="flex items-center gap-2 px-4 py-3 bg-cards border border-borders hover:bg-borders/50 text-text font-medium rounded-lg transition-colors"
+              aria-label="Download Resume"
+              title="Download PDF"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+          </div>
           <a href="https://github.com/yogeswaranv007" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-3 bg-cards border border-borders hover:border-primary/50 text-text hover:text-primary font-medium rounded-lg transition-colors">
             <FaGithub className="w-5 h-5" />
           </a>

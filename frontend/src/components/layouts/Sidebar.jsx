@@ -6,11 +6,13 @@ import {
   Network, 
   Mail,
   LineChart,
-  TerminalSquare
+  TerminalSquare,
+  FileText
 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { resumeService } from '../../services/resumeService';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
@@ -56,14 +58,12 @@ export function Sidebar({ className = '' }) {
       </nav>
 
       <div className="p-4 border-t border-borders/50 space-y-4">
-        <a 
-          href="/resume.pdf" 
-          target="_blank" 
-          rel="noreferrer"
+        <button 
+          onClick={() => resumeService.viewResume()}
           className="flex items-center justify-center gap-2 w-full px-3 py-2.5 bg-primary/10 hover:bg-primary text-primary hover:text-white transition-colors rounded-lg text-sm font-medium"
         >
-          View Resume
-        </a>
+          <FileText className="w-4 h-4" /> View Resume
+        </button>
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-cards border border-borders/50">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-xs text-text/70 font-medium">System Online</span>
