@@ -2,6 +2,7 @@ D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\excep
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\controller\contact\ContactController.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\PortfolioApplication.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\service\github\GithubService.java
+D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\dto\email\BrevoRequestDTO.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\config\JpaAuditConfig.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\controller\RootController.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\dto\github\ActivityDTO.java
@@ -11,13 +12,13 @@ D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\clien
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\dto\github\StatsDTO.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\entity\ContactMessage.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\repository\ContactMessageRepository.java
-D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\service\email\GmailEmailService.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\config\CorsConfig.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\config\WebClientConfig.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\dto\contact\ContactResponseDTO.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\dto\github\PinnedRepoDTO.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\dto\github\RepositoryDTO.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\config\AsyncConfig.java
+D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\service\email\BrevoEmailService.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\service\contact\ContactService.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\service\email\EmailService.java
 D:\deskk\projects\portfolio\backend\src\main\java\com\yogeswaran\portfolio\controller\github\GithubController.java

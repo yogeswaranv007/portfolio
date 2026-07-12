@@ -27,4 +27,20 @@ public class WebClientConfig {
 
         return builder.build();
     }
+
+    @Value("${brevo.api.url}")
+    private String brevoApiUrl;
+
+    @Value("${brevo.api.key}")
+    private String brevoApiKey;
+
+    @Bean
+    public WebClient brevoWebClient() {
+        return WebClient.builder()
+                .baseUrl(brevoApiUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .defaultHeader(HttpHeaders.ACCEPT, "application/json")
+                .defaultHeader("api-key", brevoApiKey)
+                .build();
+    }
 }

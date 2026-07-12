@@ -1,5 +1,6 @@
 com\yogeswaran\portfolio\PortfolioApplication.class
 com\yogeswaran\portfolio\repository\ContactMessageRepository.class
+com\yogeswaran\portfolio\service\email\BrevoEmailService.class
 com\yogeswaran\portfolio\entity\ContactMessage$ContactMessageBuilder.class
 com\yogeswaran\portfolio\dto\github\ProfileDTO.class
 com\yogeswaran\portfolio\dto\contact\ContactRequestDTO.class
@@ -8,8 +9,8 @@ com\yogeswaran\portfolio\dto\contact\ContactResponseDTO.class
 com\yogeswaran\portfolio\dto\github\StatsDTO.class
 com\yogeswaran\portfolio\controller\github\GithubController.class
 com\yogeswaran\portfolio\controller\RootController.class
+com\yogeswaran\portfolio\dto\email\BrevoRequestDTO$Sender.class
 com\yogeswaran\portfolio\client\github\GithubClient.class
-com\yogeswaran\portfolio\service\email\GmailEmailService.class
 com\yogeswaran\portfolio\exception\GlobalExceptionHandler.class
 com\yogeswaran\portfolio\dto\github\RepositoryDTO.class
 com\yogeswaran\portfolio\config\CacheConfig.class
@@ -18,7 +19,9 @@ com\yogeswaran\portfolio\service\email\EmailService.class
 com\yogeswaran\portfolio\config\AsyncConfig.class
 com\yogeswaran\portfolio\dto\github\LanguageDTO.class
 com\yogeswaran\portfolio\service\github\GithubService.class
+com\yogeswaran\portfolio\dto\email\BrevoRequestDTO$Recipient.class
 com\yogeswaran\portfolio\config\WebClientConfig.class
+com\yogeswaran\portfolio\dto\email\BrevoRequestDTO.class
 com\yogeswaran\portfolio\dto\github\PinnedRepoDTO.class
 com\yogeswaran\portfolio\service\contact\ContactService.class
 com\yogeswaran\portfolio\config\JpaAuditConfig.class
