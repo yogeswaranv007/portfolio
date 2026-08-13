@@ -72,11 +72,17 @@ public class DataSeeder implements CommandLineRunner {
         }
     }
 
+    private ObjectMapper createMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
+    }
+
     private void seedProfile() {
         try {
             String json = readResource("data/profile.json");
             if (json != null) {
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper mapper = createMapper();
                 Profile profile = mapper.readValue(json, Profile.class);
                 profile.setId("prof-1");
                 profileRepository.save(profile);
@@ -91,7 +97,7 @@ public class DataSeeder implements CommandLineRunner {
         try {
             String json = readResource("data/projects.json");
             if (json != null) {
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper mapper = createMapper();
                 List<Project> projects = mapper.readValue(json, new TypeReference<List<Project>>() {});
                 int order = 0;
                 for (Project p : projects) {
@@ -109,7 +115,7 @@ public class DataSeeder implements CommandLineRunner {
         try {
             String json = readResource("data/skills.json");
             if (json != null) {
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper mapper = createMapper();
                 List<Skill> skills = mapper.readValue(json, new TypeReference<List<Skill>>() {});
                 int order = 0;
                 for (Skill s : skills) {
@@ -127,7 +133,7 @@ public class DataSeeder implements CommandLineRunner {
         try {
             String json = readResource("data/achievements.json");
             if (json != null) {
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper mapper = createMapper();
                 List<Achievement> achievements = mapper.readValue(json, new TypeReference<List<Achievement>>() {});
                 int order = 0;
                 for (Achievement a : achievements) {
