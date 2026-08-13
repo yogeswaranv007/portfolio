@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
@@ -16,9 +15,6 @@ import org.springframework.util.FileCopyUtils;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Component
@@ -65,15 +61,26 @@ public class DataSeeder implements CommandLineRunner {
         }
     }
 
+    private String readResource(String path) throws Exception {
+        ClassPathResource resource = new ClassPathResource(path);
+        if (!resource.exists()) {
+            log.warn("Resource not found: {}", path);
+            return null;
+        }
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
+            return FileCopyUtils.copyToString(reader);
+        }
+    }
+
     private void seedProfile() {
         try {
-            Path path = Paths.get("../frontend/src/data/profile.json");
-            if (Files.exists(path)) {
+            String json = readResource("data/profile.json");
+            if (json != null) {
                 ObjectMapper mapper = new ObjectMapper();
-                Profile profile = mapper.readValue(path.toFile(), Profile.class);
+                Profile profile = mapper.readValue(json, Profile.class);
                 profile.setId("prof-1");
                 profileRepository.save(profile);
-                log.info("Seeded profile data from frontend JSON");
+                log.info("Seeded profile data from classpath JSON");
             }
         } catch (Exception e) {
             log.error("Failed to seed profile: {}", e.getMessage());
@@ -82,16 +89,16 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedProjects() {
         try {
-            Path path = Paths.get("../frontend/src/data/projects.json");
-            if (Files.exists(path)) {
+            String json = readResource("data/projects.json");
+            if (json != null) {
                 ObjectMapper mapper = new ObjectMapper();
-                List<Project> projects = mapper.readValue(path.toFile(), new TypeReference<List<Project>>() {});
+                List<Project> projects = mapper.readValue(json, new TypeReference<List<Project>>() {});
                 int order = 0;
                 for (Project p : projects) {
                     p.setDisplayOrder(order++);
                     projectRepository.save(p);
                 }
-                log.info("Seeded projects data from frontend JSON");
+                log.info("Seeded projects data from classpath JSON");
             }
         } catch (Exception e) {
             log.error("Failed to seed projects: {}", e.getMessage());
@@ -100,16 +107,16 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedSkills() {
         try {
-            Path path = Paths.get("../frontend/src/data/skills.json");
-            if (Files.exists(path)) {
+            String json = readResource("data/skills.json");
+            if (json != null) {
                 ObjectMapper mapper = new ObjectMapper();
-                List<Skill> skills = mapper.readValue(path.toFile(), new TypeReference<List<Skill>>() {});
+                List<Skill> skills = mapper.readValue(json, new TypeReference<List<Skill>>() {});
                 int order = 0;
                 for (Skill s : skills) {
                     s.setDisplayOrder(order++);
                     skillRepository.save(s);
                 }
-                log.info("Seeded skills data from frontend JSON");
+                log.info("Seeded skills data from classpath JSON");
             }
         } catch (Exception e) {
             log.error("Failed to seed skills: {}", e.getMessage());
@@ -118,16 +125,16 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedAchievements() {
         try {
-            Path path = Paths.get("../frontend/src/data/achievements.json");
-            if (Files.exists(path)) {
+            String json = readResource("data/achievements.json");
+            if (json != null) {
                 ObjectMapper mapper = new ObjectMapper();
-                List<Achievement> achievements = mapper.readValue(path.toFile(), new TypeReference<List<Achievement>>() {});
+                List<Achievement> achievements = mapper.readValue(json, new TypeReference<List<Achievement>>() {});
                 int order = 0;
                 for (Achievement a : achievements) {
                     a.setDisplayOrder(order++);
                     achievementRepository.save(a);
                 }
-                log.info("Seeded achievements data from frontend JSON");
+                log.info("Seeded achievements data from classpath JSON");
             }
         } catch (Exception e) {
             log.error("Failed to seed achievements: {}", e.getMessage());

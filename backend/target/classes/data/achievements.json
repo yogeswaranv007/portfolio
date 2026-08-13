@@ -1,0 +1,27 @@
+[
+  {
+    "year": "2023",
+    "title": "Started B.Tech IT",
+    "description": "Began formal education in Information Technology, focusing on core computer science fundamentals."
+  },
+  {
+    "year": "2023",
+    "title": "Learned Java & Built Full-Stack Projects",
+    "description": "Mastered Java and Spring Boot, building end-to-end web applications like the E-Tutor Platform."
+  },
+  {
+    "year": "2024",
+    "title": "400+ DSA Problems",
+    "description": "Solved 400+ LeetCode problems, maintaining a 100+ Days Coding streak to sharpen problem-solving skills."
+  },
+  {
+    "year": "2025",
+    "title": "Statathon Top 25 National Finalist",
+    "description": "Led a team to the national grand finale among 5,000+ ideas in MoSPI Statathon 2025 with an AI Survey Tool."
+  },
+  {
+    "year": "2025",
+    "title": "HackSagon Grand Finalist",
+    "description": "Competed against 600+ teams in the IEEE HackSagon, delivering high-impact software solutions under pressure."
+  }
+]

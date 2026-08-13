@@ -1,0 +1,11 @@
+{
+  "name": "Yogeswaran V",
+  "title": "Software Engineer",
+  "roles": ["Java Backend Developer", "Full Stack Developer", "Problem Solver"],
+  "about": "Final-year Information Technology student passionate about building scalable backend systems, modern web applications, and AI-powered solutions. I enjoy transforming complex ideas into production-ready software.",
+  "email": "yogeswaranv599@gmail.com",
+  "phone": "+91 6383031849",
+  "location": "India",
+  "resumeUrl": "/resume.pdf",
+  "currentFocus": ["Spring Boot Microservices", "Docker & Redis", "System Design Architecture", "AWS Cloud Practitioner"]
+}
