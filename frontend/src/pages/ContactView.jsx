@@ -68,7 +68,7 @@ export default function ContactView() {
   if (!profileData) return null;
 
   return (
-    <div className="space-y-12 pb-20 max-w-5xl mx-auto">
+    <div className="space-y-12 pb-4 max-w-5xl mx-auto">
       <div className="space-y-4 text-center md:text-left relative">
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <motion.h1 
@@ -133,11 +133,11 @@ export default function ContactView() {
           </div>
 
           <div className="flex gap-4">
-            <a href="https://github.com/yogeswaranv007" target="_blank" rel="noreferrer" className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-text/50 hover:bg-text/5 transition-all duration-300">
+            <a href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} target="_blank" rel="noreferrer" className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-text/50 hover:bg-text/5 transition-all duration-300">
               <FaGithub className="w-8 h-8 text-text/70 group-hover:text-text group-hover:scale-110 transition-all" />
               <span className="text-sm font-medium text-text/70 group-hover:text-text transition-colors">GitHub</span>
             </a>
-            <a href="#" target="_blank" rel="noreferrer" className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
+            <a href={profileData.linkedin || '#'} target="_blank" rel="noreferrer" className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
               <FaLinkedin className="w-8 h-8 text-text/70 group-hover:text-primary group-hover:scale-110 transition-all" />
               <span className="text-sm font-medium text-text/70 group-hover:text-primary transition-colors">LinkedIn</span>
             </a>
