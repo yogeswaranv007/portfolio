@@ -81,15 +81,15 @@ export default function AdminSkills() {
     
     setSkills(newSkills);
     
-    // Note: Reordering persists by resaving the entire array. 
-    // Since our service saves individually, we will directly overwrite localStorage here
-    // just for the sake of reordering the array, or we can add a reorder function to the service.
-    // For now, we'll overwrite the local storage directly via the service logic.
     try {
-      localStorage.setItem('portfolio_skills', JSON.stringify(newSkills));
+      // Save the new order to the backend
+      const updatedList = newSkills.map((item, i) => ({ ...item, displayOrder: i }));
+      await Promise.all(updatedList.map(item => portfolioService.saveSkill(item)));
       toast.success("Reordered successfully");
+      loadSkills(); // Refresh to ensure sync
     } catch (e) {
       toast.error("Failed to save order");
+      loadSkills(); // Revert on failure
     }
   };
 

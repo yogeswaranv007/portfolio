@@ -93,10 +93,10 @@ export function Hero() {
               <Download className="w-4 h-4" />
             </a>
           </div>
-          <a href="https://github.com/yogeswaranv007" target="_blank" rel="noreferrer" className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1">
+          <a href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} target="_blank" rel="noreferrer" className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1">
             <FaGithub className="w-5 h-5" />
           </a>
-          <a href="#" target="_blank" rel="noreferrer" className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1">
+          <a href={profileData.linkedin || '#'} target="_blank" rel="noreferrer" className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1">
             <FaLinkedin className="w-5 h-5" />
           </a>
         </motion.div>

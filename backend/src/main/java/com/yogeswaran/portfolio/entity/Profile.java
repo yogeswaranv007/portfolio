@@ -38,6 +38,8 @@ public class Profile {
     private String phone;
     private String location;
     private String resumeUrl;
+    private String github;
+    private String linkedin;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "profile_focus", joinColumns = @JoinColumn(name = "profile_id"))

@@ -77,10 +77,14 @@ export default function AdminAchievements() {
     setAchievements(newList);
     
     try {
-      localStorage.setItem('portfolio_achievements', JSON.stringify(newList));
+      // Save the new order to the backend
+      const updatedList = newList.map((item, i) => ({ ...item, displayOrder: i }));
+      await Promise.all(updatedList.map(item => portfolioService.saveAchievement(item)));
       toast.success("Reordered successfully");
+      loadAchievements(); // Refresh to ensure sync
     } catch (e) {
       toast.error("Failed to save order");
+      loadAchievements(); // Revert on failure
     }
   };
 
