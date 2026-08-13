@@ -1,165 +1,189 @@
-import defaultProfile from '../data/profile.json';
-import defaultProjects from '../data/projects.json';
-import defaultSkills from '../data/skills.json';
-import defaultAchievements from '../data/achievements.json';
-import defaultCodingProfiles from '../data/codingProfiles.json';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
-const STORAGE_KEYS = {
-  PROFILE: 'portfolio_profile',
-  PROJECTS: 'portfolio_projects',
-  SKILLS: 'portfolio_skills',
-  ACHIEVEMENTS: 'portfolio_achievements',
-  CODING_PROFILES: 'portfolio_coding_profiles',
-  MESSAGES: 'portfolio_messages'
+const getHeaders = () => {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
 };
 
-const hydrateWithIds = (data, prefix) => {
-  if (Array.isArray(data)) {
-    return data.map((item, i) => item.id ? item : { ...item, id: `${prefix}-${i}` });
-  }
-  return data;
-};
-
-const getFromStorage = (key, defaultData, prefix = 'item') => {
-  try {
-    const data = localStorage.getItem(key);
-    if (!data) return hydrateWithIds(defaultData, prefix);
-    
-    const parsed = JSON.parse(data);
-    return hydrateWithIds(parsed, prefix);
-  } catch (e) {
-    console.error(`Error reading ${key} from localStorage`, e);
-    return hydrateWithIds(defaultData, prefix);
-  }
-};
-
-const saveToStorage = (key, data) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (e) {
-    console.error(`Error saving ${key} to localStorage`, e);
-  }
+const handleResponse = async (response) => {
+    if (!response.ok) {
+        if (response.status === 401) {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin/login';
+        }
+        const error = await response.text();
+        throw new Error(error);
+    }
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
 };
 
 export const portfolioService = {
   // --- Profile ---
   getProfile: async () => {
-    return getFromStorage(STORAGE_KEYS.PROFILE, defaultProfile);
+      const response = await fetch(`${API_URL}/portfolio/profile`);
+      return handleResponse(response);
   },
   updateProfile: async (profileData) => {
-    saveToStorage(STORAGE_KEYS.PROFILE, profileData);
-    return profileData;
+      const response = await fetch(`${API_URL}/admin/portfolio/profile`, {
+          method: 'PUT',
+          headers: getHeaders(),
+          body: JSON.stringify(profileData),
+      });
+      return handleResponse(response);
   },
 
   // --- Projects ---
   getProjects: async () => {
-    return getFromStorage(STORAGE_KEYS.PROJECTS, defaultProjects);
+      const response = await fetch(`${API_URL}/portfolio/projects`);
+      return handleResponse(response);
   },
   getProjectById: async (id) => {
-    const projects = getFromStorage(STORAGE_KEYS.PROJECTS, defaultProjects);
-    return projects.find(p => p.id === id);
+      const response = await fetch(`${API_URL}/portfolio/projects/${id}`);
+      return handleResponse(response);
   },
   saveProject: async (projectData) => {
-    const projects = getFromStorage(STORAGE_KEYS.PROJECTS, defaultProjects);
-    const index = projects.findIndex(p => p.id === projectData.id);
-    if (index >= 0) {
-      projects[index] = projectData;
-    } else {
-      projects.push({ ...projectData, id: projectData.id || `proj-${Date.now()}` });
-    }
-    saveToStorage(STORAGE_KEYS.PROJECTS, projects);
-    return projects;
+      const isNew = !projectData.id;
+      const url = isNew ? `${API_URL}/admin/portfolio/projects` : `${API_URL}/admin/portfolio/projects/${projectData.id}`;
+      const method = isNew ? 'POST' : 'PUT';
+      
+      const response = await fetch(url, {
+          method,
+          headers: getHeaders(),
+          body: JSON.stringify({
+            ...projectData,
+            id: isNew ? `proj-${Date.now()}` : projectData.id
+          }),
+      });
+      return handleResponse(response);
   },
   deleteProject: async (id) => {
-    const projects = getFromStorage(STORAGE_KEYS.PROJECTS, defaultProjects);
-    const updated = projects.filter(p => p.id !== id);
-    saveToStorage(STORAGE_KEYS.PROJECTS, updated);
-    return updated;
+      const response = await fetch(`${API_URL}/admin/portfolio/projects/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+      });
+      return handleResponse(response);
   },
 
   // --- Skills ---
   getSkills: async () => {
-    const data = getFromStorage(STORAGE_KEYS.SKILLS, defaultSkills);
-    // Migration check: if the data in localStorage is an object (old format) instead of an array,
-    // reset it to the new defaultSkills array.
-    if (!Array.isArray(data)) {
-      console.warn("Detected old skills data format in localStorage. Resetting to default array format.");
-      saveToStorage(STORAGE_KEYS.SKILLS, defaultSkills);
-      return defaultSkills;
-    }
-    return data;
+      const response = await fetch(`${API_URL}/portfolio/skills`);
+      return handleResponse(response);
   },
   saveSkill: async (skillData) => {
-    const skills = getFromStorage(STORAGE_KEYS.SKILLS, defaultSkills);
-    const index = skills.findIndex(s => s.id === skillData.id);
-    if (index >= 0) {
-      skills[index] = skillData;
-    } else {
-      skills.push({ ...skillData, id: skillData.id || `skill-${Date.now()}` });
-    }
-    saveToStorage(STORAGE_KEYS.SKILLS, skills);
-    return skills;
+      const isNew = !skillData.id || String(skillData.id).startsWith('skill-');
+      const url = isNew ? `${API_URL}/admin/portfolio/skills` : `${API_URL}/admin/portfolio/skills/${skillData.id}`;
+      const method = isNew ? 'POST' : 'PUT';
+      
+      const payload = { ...skillData };
+      if (isNew) delete payload.id; // DB auto-generates ID
+
+      const response = await fetch(url, {
+          method,
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+      });
+      return handleResponse(response);
   },
   deleteSkill: async (id) => {
-    const skills = getFromStorage(STORAGE_KEYS.SKILLS, defaultSkills);
-    const updated = skills.filter(s => s.id !== id);
-    saveToStorage(STORAGE_KEYS.SKILLS, updated);
-    return updated;
+      const response = await fetch(`${API_URL}/admin/portfolio/skills/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+      });
+      return handleResponse(response);
   },
 
   // --- Achievements ---
   getAchievements: async () => {
-    return getFromStorage(STORAGE_KEYS.ACHIEVEMENTS, defaultAchievements);
+      const response = await fetch(`${API_URL}/portfolio/achievements`);
+      return handleResponse(response);
   },
   saveAchievement: async (achievementData) => {
-    const achievements = getFromStorage(STORAGE_KEYS.ACHIEVEMENTS, defaultAchievements);
-    const index = achievements.findIndex(a => a.id === achievementData.id);
-    if (index >= 0) {
-      achievements[index] = achievementData;
-    } else {
-      achievements.push({ ...achievementData, id: achievementData.id || `ach-${Date.now()}` });
-    }
-    saveToStorage(STORAGE_KEYS.ACHIEVEMENTS, achievements);
-    return achievements;
+      const isNew = !achievementData.id || String(achievementData.id).startsWith('ach-');
+      const url = isNew ? `${API_URL}/admin/portfolio/achievements` : `${API_URL}/admin/portfolio/achievements/${achievementData.id}`;
+      const method = isNew ? 'POST' : 'PUT';
+      
+      const payload = { ...achievementData };
+      if (isNew) delete payload.id;
+
+      const response = await fetch(url, {
+          method,
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+      });
+      return handleResponse(response);
   },
   deleteAchievement: async (id) => {
-    const achievements = getFromStorage(STORAGE_KEYS.ACHIEVEMENTS, defaultAchievements);
-    const updated = achievements.filter(a => a.id !== id);
-    saveToStorage(STORAGE_KEYS.ACHIEVEMENTS, updated);
-    return updated;
+      const response = await fetch(`${API_URL}/admin/portfolio/achievements/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+      });
+      return handleResponse(response);
   },
   resetAchievements: async () => {
-    localStorage.removeItem(STORAGE_KEYS.ACHIEVEMENTS);
-    return getFromStorage(STORAGE_KEYS.ACHIEVEMENTS, defaultAchievements);
+      // Just fetch it again, no local reset
+      return portfolioService.getAchievements();
   },
 
-  // --- Coding Profiles ---
+  // --- Coding Profiles --- (Static for now)
   getCodingProfiles: async () => {
-    return getFromStorage(STORAGE_KEYS.CODING_PROFILES, defaultCodingProfiles);
+      const response = await fetch('/src/data/codingProfiles.json');
+      return response.json();
   },
 
   // --- Messages ---
   getMessages: async () => {
-    return getFromStorage(STORAGE_KEYS.MESSAGES, []);
+      const response = await fetch(`${API_URL}/admin/messages`, { headers: getHeaders() });
+      return handleResponse(response);
   },
   sendMessage: async (messageData) => {
-    const messages = getFromStorage(STORAGE_KEYS.MESSAGES, []);
-    const newMessage = { ...messageData, id: `msg-${Date.now()}`, date: new Date().toISOString(), read: false };
-    messages.push(newMessage);
-    saveToStorage(STORAGE_KEYS.MESSAGES, messages);
-    return newMessage;
+      const response = await fetch(`${API_URL}/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(messageData),
+      });
+      return handleResponse(response);
   },
   markMessageRead: async (id) => {
-    const messages = getFromStorage(STORAGE_KEYS.MESSAGES, []);
-    const msg = messages.find(m => m.id === id);
-    if (msg) msg.read = true;
-    saveToStorage(STORAGE_KEYS.MESSAGES, messages);
-    return messages;
+      const response = await fetch(`${API_URL}/admin/messages/${id}/read`, {
+          method: 'PUT',
+          headers: getHeaders(),
+      });
+      return handleResponse(response);
   },
   deleteMessage: async (id) => {
-    const messages = getFromStorage(STORAGE_KEYS.MESSAGES, []);
-    const updated = messages.filter(m => m.id !== id);
-    saveToStorage(STORAGE_KEYS.MESSAGES, updated);
-    return updated;
+      const response = await fetch(`${API_URL}/admin/messages/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders(),
+      });
+      return handleResponse(response);
   }
+};
+
+export const authService = {
+    login: async (email, password) => {
+        const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await handleResponse(response);
+        if (data.token) {
+            localStorage.setItem('admin_token', data.token);
+        }
+        return data;
+    },
+    logout: () => {
+        localStorage.removeItem('admin_token');
+        window.location.href = '/admin/login';
+    },
+    isAuthenticated: () => {
+        return !!localStorage.getItem('admin_token');
+    }
 };

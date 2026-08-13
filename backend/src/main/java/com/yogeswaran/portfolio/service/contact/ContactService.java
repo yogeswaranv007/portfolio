@@ -37,4 +37,19 @@ public class ContactService {
         emailService.sendAdminNotification(message);
         emailService.sendAutoReply(message);
     }
+
+    public java.util.List<ContactMessage> getAllMessages() {
+        return repository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+    }
+
+    public void markAsRead(java.util.UUID id) {
+        repository.findById(id).ifPresent(message -> {
+            message.setStatus(ContactMessage.Status.READ);
+            repository.save(message);
+        });
+    }
+
+    public void deleteMessage(java.util.UUID id) {
+        repository.deleteById(id);
+    }
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, User, Code2, FolderGit2, Link as LinkIcon, Mail, Settings, LogOut, Menu, X } from 'lucide-react';
+import { authService } from '../../services/portfolioService';
 
 const adminLinks = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -17,17 +18,15 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Basic development-only authentication check
+  // Basic authentication check
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    if (!token) {
+    if (!authService.isAuthenticated()) {
       navigate('/admin/login');
     }
   }, [navigate, location.pathname]);
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token');
-    navigate('/admin/login');
+    authService.logout();
   };
 
   return (
