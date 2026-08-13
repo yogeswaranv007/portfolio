@@ -72,23 +72,26 @@ export function Hero() {
           transition={{ delay: 0.3 }}
           className="flex flex-wrap items-center gap-4 pt-4"
         >
-          <a href="/projects" className="group flex items-center gap-2 px-6 py-3.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]">
+          <a href="#projects" className="group flex items-center gap-2 px-6 py-3.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]">
             View Projects <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
           <div className="flex items-center gap-2">
-            <button 
-              onClick={() => resumeService.viewResume()} 
+            <a 
+              href={resumeService.getResumeMetadata().path}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:bg-borders/50 text-text font-medium rounded-xl transition-all hover:border-primary/50"
             >
               <FileText className="w-4 h-4" /> Resume
-            </button>
-            <button 
-              onClick={() => resumeService.downloadResume()} 
+            </a>
+            <a 
+              href={resumeService.getResumeMetadata().path}
+              download={resumeService.getResumeMetadata().name}
               className="flex items-center justify-center px-4 py-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:bg-borders/50 text-text font-medium rounded-xl transition-all hover:border-primary/50"
               title="Download PDF"
             >
               <Download className="w-4 h-4" />
-            </button>
+            </a>
           </div>
           <a href="https://github.com/yogeswaranv007" target="_blank" rel="noreferrer" className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1">
             <FaGithub className="w-5 h-5" />
