@@ -119,6 +119,9 @@ public class DataSeeder implements CommandLineRunner {
                 List<Skill> skills = mapper.readValue(json, new TypeReference<List<Skill>>() {});
                 int order = 0;
                 for (Skill s : skills) {
+                    if (s.getIcon() == null || s.getIcon().isEmpty()) {
+                        s.setIcon("FaCode");
+                    }
                     s.setDisplayOrder(order++);
                     skillRepository.save(s);
                 }
