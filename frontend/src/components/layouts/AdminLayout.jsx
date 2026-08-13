@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, User, Code2, FolderGit2, Link as LinkIcon, Mail, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, User, Code2, FolderGit2, Link as LinkIcon, Mail, Settings, LogOut, Menu, X, Terminal } from 'lucide-react';
 import { authService } from '../../services/portfolioService';
 
 const adminLinks = [
@@ -10,6 +10,7 @@ const adminLinks = [
   { path: '/admin/skills', label: 'Skills', icon: Code2 },
   { path: '/admin/projects', label: 'Projects', icon: FolderGit2 },
   { path: '/admin/achievements', label: 'Achievements', icon: LinkIcon },
+  { path: '/admin/coding-profiles', label: 'Coding Profiles', icon: Terminal },
   { path: '/admin/messages', label: 'Messages', icon: Mail },
 ];
 

@@ -27,6 +27,7 @@ public class DataSeeder implements CommandLineRunner {
     private final ProjectRepository projectRepository;
     private final SkillRepository skillRepository;
     private final AchievementRepository achievementRepository;
+    private final CodingProfileRepository codingProfileRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -45,6 +46,9 @@ public class DataSeeder implements CommandLineRunner {
         }
         if (achievementRepository.count() == 0) {
             seedAchievements();
+        }
+        if (codingProfileRepository.count() == 0) {
+            seedCodingProfiles();
         }
     }
 
@@ -147,6 +151,24 @@ public class DataSeeder implements CommandLineRunner {
             }
         } catch (Exception e) {
             log.error("Failed to seed achievements: {}", e.getMessage());
+        }
+    }
+
+    private void seedCodingProfiles() {
+        try {
+            String json = readResource("data/codingProfiles.json");
+            if (json != null) {
+                ObjectMapper mapper = createMapper();
+                List<CodingProfile> profiles = mapper.readValue(json, new TypeReference<List<CodingProfile>>() {});
+                int order = 0;
+                for (CodingProfile cp : profiles) {
+                    cp.setDisplayOrder(order++);
+                    codingProfileRepository.save(cp);
+                }
+                log.info("Seeded coding profiles data from classpath JSON");
+            }
+        } catch (Exception e) {
+            log.error("Failed to seed coding profiles: {}", e.getMessage());
         }
     }
 }

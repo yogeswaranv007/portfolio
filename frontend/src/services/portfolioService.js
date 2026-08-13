@@ -131,10 +131,32 @@ export const portfolioService = {
       return portfolioService.getAchievements();
   },
 
-  // --- Coding Profiles --- (Static for now)
+  // --- Coding Profiles ---
   getCodingProfiles: async () => {
-      const response = await fetch('/src/data/codingProfiles.json');
-      return response.json();
+      const response = await fetch(`${API_URL}/portfolio/coding-profiles`);
+      return handleResponse(response);
+  },
+  saveCodingProfile: async (profileData) => {
+      const isNew = !profileData.id;
+      const url = isNew ? `${API_URL}/admin/portfolio/coding-profiles` : `${API_URL}/admin/portfolio/coding-profiles/${profileData.id}`;
+      const method = isNew ? 'POST' : 'PUT';
+      
+      const payload = { ...profileData };
+      if (isNew) delete payload.id;
+
+      const response = await fetch(url, {
+          method,
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+      });
+      return handleResponse(response);
+  },
+  deleteCodingProfile: async (id) => {
+      const response = await fetch(`${API_URL}/admin/portfolio/coding-profiles/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+      });
+      return handleResponse(response);
   },
 
   // --- Messages ---

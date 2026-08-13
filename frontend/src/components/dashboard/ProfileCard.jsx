@@ -21,7 +21,7 @@ export function ProfileCard({ profile, index }) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
-      className="glass-card p-5 flex items-center justify-between gap-4 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(37,99,235,0.1)] hover:border-primary/40 transition-all duration-300 group relative overflow-hidden"
+      className="glass-card p-5 flex flex-col justify-between gap-4 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(37,99,235,0.1)] hover:border-primary/40 transition-all duration-300 group relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
@@ -35,7 +35,9 @@ export function ProfileCard({ profile, index }) {
         </div>
       </div>
 
-      <ExternalLink className="w-4 h-4 text-text/30 group-hover:text-primary opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 relative z-10" />
+      <div className="flex items-center text-xs font-bold text-text/50 group-hover:text-primary transition-colors relative z-10 mt-2">
+        View Profile <span className="ml-1 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">→</span>
+      </div>
     </motion.a>
   );
 }

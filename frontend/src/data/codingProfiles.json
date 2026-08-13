@@ -1,9 +1,9 @@
 [
   {
-    "platform": "GitHub",
-    "username": "yogeswaranv007",
-    "url": "https://github.com/yogeswaranv007",
-    "icon": "github"
+    "platform": "HackerRank",
+    "username": "yogeswaranv599",
+    "url": "https://www.hackerrank.com/profile/yogeswaranv599",
+    "icon": "terminal"
   },
   {
     "platform": "LeetCode",
@@ -13,14 +13,8 @@
   },
   {
     "platform": "GeeksforGeeks",
-    "username": "yogeswar7pc8",
-    "url": "https://www.geeksforgeeks.org/profile/yogeswar7pc8",
+    "username": "yogeswaranv",
+    "url": "https://www.geeksforgeeks.org/profile/yogeswaranv",
     "icon": "code"
-  },
-  {
-    "platform": "HackerRank",
-    "username": "yogeswaranv599",
-    "url": "https://www.hackerrank.com/profile/yogeswaranv599",
-    "icon": "terminal"
   }
 ]

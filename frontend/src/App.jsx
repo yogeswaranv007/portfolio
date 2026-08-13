@@ -17,6 +17,7 @@ const AdminSkills = lazy(() => import('./pages/admin/AdminSkills').then(module =
 const AdminProjects = lazy(() => import('./pages/admin/AdminProjects').then(module => ({ default: module.default })));
 const AdminProjectEdit = lazy(() => import('./pages/admin/AdminProjectEdit').then(module => ({ default: module.default })));
 const AdminAchievements = lazy(() => import('./pages/admin/AdminAchievements').then(module => ({ default: module.default })));
+const AdminCodingProfiles = lazy(() => import('./pages/admin/AdminCodingProfiles').then(module => ({ default: module.default })));
 const AdminMessages = lazy(() => import('./pages/admin/AdminMessages').then(module => ({ default: module.default })));
 
 // A wrapper component to provide useLocation to AnimatePresence if needed, 
@@ -50,6 +51,7 @@ function App() {
             <Route path="projects" element={<AdminProjects />} />
             <Route path="projects/:id/edit" element={<AdminProjectEdit />} />
             <Route path="achievements" element={<AdminAchievements />} />
+            <Route path="coding-profiles" element={<AdminCodingProfiles />} />
             <Route path="messages" element={<AdminMessages />} />
           </Route>
         </Routes>
