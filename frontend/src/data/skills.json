@@ -1,7 +1,19 @@
-{
-  "Languages": ["Java", "C", "JavaScript"],
-  "Backend": ["Spring Boot", "REST APIs", "Node.js", "JWT", "OAuth"],
-  "Frontend": ["React", "Tailwind CSS", "HTML", "CSS"],
-  "Database": ["MySQL"],
-  "Tools": ["Git", "GitHub", "VS Code", "Figma", "Maven"]
-}
+[
+  { "id": "skill-1", "name": "Java", "category": "Programming Languages", "enabled": true },
+  { "id": "skill-2", "name": "C", "category": "Programming Languages", "enabled": true },
+  { "id": "skill-3", "name": "HTML", "category": "Web & Backend", "enabled": true },
+  { "id": "skill-4", "name": "CSS", "category": "Web & Backend", "enabled": true },
+  { "id": "skill-5", "name": "React.js", "category": "Web & Backend", "enabled": true },
+  { "id": "skill-6", "name": "REST APIs", "category": "Web & Backend", "enabled": true },
+  { "id": "skill-7", "name": "JWT", "category": "Web & Backend", "enabled": true },
+  { "id": "skill-8", "name": "OAuth", "category": "Web & Backend", "enabled": true },
+  { "id": "skill-9", "name": "MySQL", "category": "Database", "enabled": true },
+  { "id": "skill-10", "name": "Git", "category": "Tools", "enabled": true },
+  { "id": "skill-11", "name": "GitHub", "category": "Tools", "enabled": true },
+  { "id": "skill-12", "name": "VS Code", "category": "Tools", "enabled": true },
+  { "id": "skill-13", "name": "Figma", "category": "Tools", "enabled": true },
+  { "id": "skill-14", "name": "DSA", "category": "Core Competencies", "enabled": true },
+  { "id": "skill-15", "name": "OOP", "category": "Core Competencies", "enabled": true },
+  { "id": "skill-16", "name": "Problem Solving", "category": "Core Competencies", "enabled": true },
+  { "id": "skill-17", "name": "Debugging", "category": "Core Competencies", "enabled": true }
+]

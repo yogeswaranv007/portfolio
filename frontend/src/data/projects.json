@@ -1,16 +1,35 @@
 [
   {
     "id": "mospi-survey",
-    "title": "AI-Powered Smart Survey Tool",
+    "title": "AI-Powered Smart Survey & Polling Platform",
     "featured": true,
-    "description": "Served as Team Lead for an AI-powered survey platform selected among the Top 25 finalists nationwide from over 5,000 ideas in Statathon 2025 (MoSPI). Built responsive frontend interfaces and integrated AI-powered backend services using REST APIs and FastAPI.",
-    "problemSolved": "Traditional survey tools lack real-time insights and automated feedback analysis. MoSPI needed a way to intelligently process survey data with AI.",
-    "architecture": "React frontend communicates with a Spring Boot API Gateway, routing requests to Python FastAPI microservices for AI processing, backed by PostgreSQL.",
-    "technologies": ["React", "Spring Boot", "FastAPI", "PostgreSQL", "REST APIs"],
-    "features": ["AI Sentiment Analysis", "Dynamic Form Generation", "Real-time Dashboards", "Multilingual Support"],
-    "challenges": "Integrating asynchronous AI Python services with synchronous Spring Boot workflows.",
-    "lessonsLearned": "Gained deep understanding of microservice orchestration and API Gateway patterns.",
-    "githubUrl": "https://github.com/MOHITH2511/mospi-survey-system",
+    "description": "Developed a multilingual and multimodal survey platform for creating, distributing, collecting, and analyzing survey responses. The platform combines React, FastAPI, and Spring Boot services with AI-powered semantic analysis, translation, voice interaction, and SMS/WhatsApp survey distribution.",
+    "problemSolved": "Traditional survey platforms often require separate systems for survey creation, distribution, multilingual interaction, and response analysis. This project provides a unified platform with AI-assisted analysis and multimodal citizen interaction.",
+    "architectureData": {
+      "frontend": { "title": "React + Vite", "subtitle": "Frontend Application", "icon": "FaReact" },
+      "backend": { "title": "Spring Boot", "subtitle": "Core Backend", "icon": "FaJava", "items": ["REST APIs", "Business Logic"] },
+      "services": [
+        { "title": "FastAPI", "subtitle": "AI Service", "icon": "FaPython", "items": ["BGE-M3", "Semantic/RAG Processing", "Translation APIs"] },
+        { "title": "Twilio", "subtitle": "Communication", "icon": "MessageSquare", "items": ["SMS", "WhatsApp"] },
+        { "title": "PostgreSQL", "subtitle": "Database", "icon": "Database", "items": [] }
+      ]
+    },
+    "technologies": ["React", "Vite", "Tailwind CSS", "Java", "Spring Boot", "Spring Data JPA", "Python", "FastAPI", "SentenceTransformers", "BGE-M3", "Pandas", "H2", "Twilio", "Bhashini", "Google Translation APIs"],
+    "features": [
+      "Dynamic Survey Creation",
+      "Citizen Survey Interface",
+      "AI Semantic Analysis",
+      "Multilingual Support",
+      "Voice-Based Responses",
+      "Text-to-Speech",
+      "SMS & WhatsApp Distribution",
+      "Geolocation & Session Metadata",
+      "Admin Analytics Dashboard",
+      "AI-Assisted Response Processing"
+    ],
+    "challenges": "Integrating multiple services built with different technologies while maintaining reliable communication between the React frontend, FastAPI AI engine, and Spring Boot communication service. Another challenge was integrating AI-based semantic processing, multilingual translation, voice functionality, and communication APIs into a single survey workflow.",
+    "lessonsLearned": "Gained practical experience in microservice-based application development, REST API integration, AI/RAG workflows using embeddings, multilingual processing, Spring Boot services, FastAPI, and third-party API integration.",
+    "githubUrl": "https://github.com/MOHITH2511/mospi-survey-system/tree/test",
     "liveUrl": "",
     "screenshots": []
   },
@@ -18,58 +37,134 @@
     "id": "battery-vehicle",
     "title": "Battery Vehicle Booking System",
     "featured": true,
-    "description": "Developed a vehicle booking application with secure authentication, responsive UI, and RESTful backend integration.",
-    "problemSolved": "Users needed a streamlined way to book electric vehicles without complex onboarding.",
-    "architecture": "React SPA connected to a Node.js/Express backend using JWT for auth and MySQL for transactional data.",
-    "technologies": ["React", "Node.js", "JWT", "OAuth", "REST API", "Tailwind CSS"],
-    "features": ["Secure Authentication", "Real-time Availability", "Booking Management Dashboard"],
-    "challenges": "Handling concurrent booking requests to prevent double-booking of the same vehicle.",
-    "lessonsLearned": "Implemented optimistic locking in database transactions.",
+    "description": "Developed a role-based battery vehicle booking system that manages vehicle requests, approvals, dispatch, and completion workflows for students, administrators, and watchmen. The backend was migrated from Node.js/MongoDB to Java Spring Boot with JPA/Hibernate and a MySQL-compatible TiDB Cloud database.",
+    "problemSolved": "Managing battery vehicle requests manually can lead to scheduling conflicts, unclear approval workflows, and poor visibility into booking status. The system centralizes booking, approval, and vehicle operation workflows for students, administrators, and watchmen.",
+    "architectureData": {
+      "frontend": { "title": "React.js", "subtitle": "Frontend Application", "icon": "FaReact" },
+      "backend": { "title": "Java 21 + Spring Boot", "subtitle": "Primary Backend", "icon": "FaJava", "items": ["REST APIs", "Spring Data JPA", "Hibernate"] },
+      "services": [
+        { "title": "TiDB Cloud", "subtitle": "MySQL-compatible DB", "icon": "Database", "items": [] }
+      ]
+    },
+    "technologies": ["React.js", "Tailwind CSS", "Java 21", "Spring Boot", "REST APIs", "Spring Data JPA", "Hibernate", "TiDB Cloud", "JWT", "Google OAuth"],
+    "features": [
+      "JWT Authentication",
+      "Google OAuth",
+      "Role-Based Access Control",
+      "Student Vehicle Booking",
+      "Booking Conflict Detection",
+      "Admin Approval/Rejection Workflow",
+      "Watchman Booking Management",
+      "Booking Lifecycle Tracking",
+      "User & Location Management",
+      "Audit Logging"
+    ],
+    "challenges": "Migrating the backend from a document-oriented MongoDB data model to a relational database while preserving existing API contracts and business logic. Another challenge was restructuring the Node.js backend into a layered Spring Boot architecture using controllers, services, repositories, entities, and DTOs.",
+    "lessonsLearned": "Gained practical experience in Java Spring Boot backend development, REST API design, JPA/Hibernate, relational database modeling, JWT authentication, role-based authorization, and migrating an existing Node.js/MongoDB application to a Java-based relational architecture.",
     "githubUrl": "https://github.com/yogeswaranv007/battery_vehicle_booking_app",
     "liveUrl": "https://battery-vehicle-booking-app.vercel.app/",
     "screenshots": []
   },
   {
     "id": "cloud-tracker",
-    "title": "Multi Cloud Usage Tracker",
+    "title": "Multi-Cloud Monitoring & Cost Optimization Platform",
     "featured": false,
-    "description": "Cloud resource monitoring platform featuring dashboards, billing insights, cloud usage analytics, and scalable backend services.",
-    "problemSolved": "Managing usage across AWS, GCP, and Azure from a single dashboard.",
-    "architecture": "Spring Boot aggregates metrics from cloud provider SDKs and serves them via REST to a React dashboard.",
-    "technologies": ["Java", "Spring Boot", "React", "AWS API", "MySQL"],
-    "features": ["Multi-Cloud Aggregation", "Billing Alerts", "Resource Visualizations"],
-    "challenges": "Normalizing billing data structures across completely different cloud APIs.",
-    "lessonsLearned": "Learned the Adapter design pattern to handle diverse external APIs gracefully.",
+    "description": "Developed a multi-cloud monitoring platform using React and FastAPI to monitor AWS and Azure resources, analyze cloud usage and costs, detect anomalies using machine learning, generate optimization recommendations, and perform resilience testing.",
+    "problemSolved": "Managing cloud infrastructure across multiple providers makes resource monitoring, cost analysis, anomaly detection, and optimization difficult. The platform provides a unified interface for monitoring AWS and Azure resources and analyzing their usage and costs.",
+    "architectureData": {
+      "frontend": { "title": "React + Vite", "subtitle": "Dashboard UI", "icon": "FaReact" },
+      "backend": { "title": "FastAPI", "subtitle": "Primary Backend", "icon": "FaPython", "items": ["REST APIs", "Data Aggregation"] },
+      "services": [
+        { "title": "AWS", "subtitle": "Cloud Infrastructure", "icon": "FaAws", "items": ["EC2", "CloudWatch", "Cost Explorer"] },
+        { "title": "Azure", "subtitle": "Cloud Infrastructure", "icon": "Cloud", "items": ["Monitor", "Cost Management", "Compute"] },
+        { "title": "ML Processing", "subtitle": "Anomaly Detection", "icon": "CpuOrange", "items": ["Scikit-learn", "Pandas", "NumPy"] }
+      ]
+    },
+    "technologies": ["React 18", "Vite", "Tailwind CSS", "Recharts", "Python", "FastAPI", "Uvicorn", "Pydantic", "Boto3", "EC2", "CloudWatch", "Cost Explorer", "SNS", "Azure SDK", "Azure Monitor", "Azure Cost Management", "Azure Compute", "Azure Communication Services", "Scikit-learn", "Pandas", "NumPy", "Matplotlib", "Plotly"],
+    "features": [
+      "AWS Resource Monitoring",
+      "Azure Resource Monitoring",
+      "Multi-Cloud Dashboard",
+      "Cloud Cost & Billing Analysis",
+      "Cost Comparison",
+      "ML-Based Anomaly Detection",
+      "Cost Prediction",
+      "Cost Optimization Recommendations",
+      "Threshold-Based Alerts",
+      "Chaos Engineering & Failure Simulation"
+    ],
+    "challenges": "Integrating different cloud provider APIs with different resource structures and billing models into a unified monitoring platform. Another challenge was processing cloud usage data for anomaly detection, cost prediction, and optimization analysis.",
+    "lessonsLearned": "Gained practical experience working with AWS and Azure APIs, cloud monitoring and billing services, FastAPI-based backend development, machine learning for anomaly detection, data processing, visualization, and cloud resilience testing.",
     "githubUrl": "https://github.com/yogeswaranv007/multi-cloud-usage-tracker",
     "liveUrl": "",
     "screenshots": []
   },
   {
     "id": "e-tutor",
-    "title": "E-Tutor Platform",
+    "title": "E-Tutor Online Tutoring Platform",
     "featured": false,
-    "description": "Interactive online learning platform with modern UI, authentication, and course management features.",
-    "problemSolved": "Connecting students with specialized tutors for one-on-one virtual sessions.",
-    "architecture": "Monolithic Spring Boot application serving REST endpoints to a React frontend.",
-    "technologies": ["React", "Spring Boot", "JWT", "MySQL"],
-    "features": ["User Roles (Student/Tutor)", "Course Management", "Session Scheduling"],
-    "challenges": "Designing an intuitive UI for scheduling across multiple time zones.",
-    "lessonsLearned": "Mastered React state management for complex calendar components.",
+    "description": "Developing an online tutoring platform designed to connect students and tutors through course discovery, tutor management, session scheduling, learning interactions, and online payments.",
+    "problemSolved": "Students and tutors need a centralized platform to manage tutoring activities, courses, sessions, authentication, and payments. The platform provides a unified full-stack solution for managing these interactions.",
+    "architectureData": {
+      "label": "Planned Architecture",
+      "frontend": { "title": "React + Vite", "subtitle": "Frontend UI", "icon": "FaReact" },
+      "backend": { "title": "Node.js + Express", "subtitle": "Core Backend", "icon": "FaNodeJs", "items": [] },
+      "services": [
+        { "title": "Auth", "subtitle": "Authentication", "icon": "Lock", "items": ["JWT", "Sessions"] },
+        { "title": "Tutors", "subtitle": "Tutor Management", "icon": "Users", "items": ["Profiles", "Workflows"] },
+        { "title": "Courses", "subtitle": "Course Management", "icon": "BookOpen", "items": ["Content", "Workflows"] },
+        { "title": "Sessions", "subtitle": "Session Management", "icon": "Calendar", "items": ["Scheduling"] },
+        { "title": "Payments", "subtitle": "Payment Integration", "icon": "CreditCard", "items": ["PayPal", "Google Pay"] },
+        { "title": "Databases", "subtitle": "Database Layer", "icon": "FaDatabase", "items": ["MongoDB", "PostgreSQL"] }
+      ]
+    },
+    "technologies": ["React 18", "Vite", "React Router", "Axios", "Node.js", "Express.js", "JWT", "bcrypt", "Express sessions", "MongoDB / Mongoose", "PostgreSQL / Sequelize", "PayPal", "Google Pay"],
+    "features": [
+      "Student & Tutor Workflows",
+      "Role-Based Authentication",
+      "Tutor Management",
+      "Course Management",
+      "Session Scheduling",
+      "Tutor-Student Interaction",
+      "Learning/Session Management",
+      "Online Payment Integration",
+      "Responsive React Interface"
+    ],
+    "challenges": "Designing a full-stack architecture with separate React frontend and Node.js/Express backend layers while integrating authentication, database operations, tutoring workflows, and third-party payment services.",
+    "lessonsLearned": "Gained practical experience in full-stack application development, React frontend development, Express REST API development, authentication, database integration, and third-party payment API integration.",
     "githubUrl": "https://github.com/yogeswaranv007/e-tutor-platform",
     "liveUrl": "",
     "screenshots": []
   },
   {
     "id": "course-optimizer",
-    "title": "AI Driven Course Path Optimizer",
+    "title": "AI-Driven Learning Path Optimizer",
     "featured": false,
-    "description": "AI-assisted recommendation platform that generates optimized learning paths based on user interests and goals.",
-    "problemSolved": "Students often get overwhelmed by the sheer volume of available courses. This curates a specific path.",
-    "architecture": "React frontend with a Python backend using scikit-learn for recommendation clustering.",
-    "technologies": ["React", "Python", "Scikit-Learn", "FastAPI"],
-    "features": ["Personalized Learning Paths", "Skill Gap Analysis", "Progress Tracking"],
-    "challenges": "Training the recommendation model on sparse user data.",
-    "lessonsLearned": "Improved data pre-processing and collaborative filtering techniques.",
+    "description": "Developed an AI-powered learning platform that generates personalized, bootcamp-style learning roadmaps based on a user's career goals, existing skills, and available study time.",
+    "problemSolved": "Students and developers often struggle to determine what skills to learn and in what order due to the large amount of available learning content. The platform generates structured and personalized learning paths based on career goals, existing skills, and available study time.",
+    "architectureData": {
+      "frontend": { "title": "React + Vite", "subtitle": "Frontend UI", "icon": "FaReact" },
+      "backend": { "title": "Node.js + Express", "subtitle": "Core Backend", "icon": "FaNodeJs", "items": ["REST APIs", "Session Management"] },
+      "services": [
+        { "title": "MongoDB", "subtitle": "Database", "icon": "FaDatabase", "items": [] },
+        { "title": "Groq API", "subtitle": "AI Integration", "icon": "Cpu", "items": ["AI Generation"] }
+      ]
+    },
+    "technologies": ["React", "Vite", "Tailwind CSS", "Node.js", "Express.js", "MongoDB", "Groq API", "JWT", "HTTP-only cookies", "Refresh tokens", "Multi-device session management"],
+    "features": [
+      "AI-Powered Learning Roadmaps",
+      "Career-Based Personalization",
+      "Skill-Based Recommendations",
+      "Study-Time-Based Planning",
+      "Day-by-Day Learning Plans",
+      "Learning Objectives & Practice Tasks",
+      "Curated Learning Resources",
+      "Progress Tracking",
+      "JWT Authentication",
+      "Multi-Device Session Management"
+    ],
+    "challenges": "Designing a system that can transform a user's career goals, existing skills, and available study time into a structured learning roadmap. Another challenge was integrating AI-generated content into the application while maintaining secure authentication and multi-device session management.",
+    "lessonsLearned": "Gained practical experience in full-stack development, AI API integration, personalized recommendation workflows, JWT and refresh-token authentication, HTTP-only cookies, session management, and building structured learning experiences with generative AI.",
     "githubUrl": "https://github.com/yogeswaranv007/Ai-driven-course-path-optimizer",
     "liveUrl": "",
     "screenshots": []

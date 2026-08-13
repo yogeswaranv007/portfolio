@@ -5,7 +5,6 @@ import {
   FolderGit2, 
   Network, 
   Mail,
-  LineChart,
   TerminalSquare,
   FileText
 } from 'lucide-react';
@@ -14,13 +13,13 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { resumeService } from '../../services/resumeService';
 
+import { toast } from 'react-hot-toast';
+
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
   { name: 'Projects', path: '/projects', icon: FolderGit2 },
   { name: 'Architecture', path: '/architecture', icon: Network },
-  { name: 'Analytics', path: '/analytics', icon: LineChart },
   { name: 'GitHub', path: '/github', icon: FaGithub },
-  { name: 'Developer Console', path: '/console', icon: TerminalSquare },
   { name: 'Contact', path: '/contact', icon: Mail },
 ];
 
@@ -63,6 +62,12 @@ export function Sidebar({ className = '' }) {
           className="flex items-center justify-center gap-2 w-full px-3 py-2.5 bg-primary/10 hover:bg-primary text-primary hover:text-white transition-colors rounded-lg text-sm font-medium"
         >
           <FileText className="w-4 h-4" /> View Resume
+        </button>
+        <button 
+          onClick={() => toast("Developer Mode is currently under development. Thank you for your interest!", { icon: '🚧' })}
+          className="flex items-center justify-center gap-2 w-full px-3 py-2.5 bg-cards border border-borders hover:border-primary/50 text-text hover:text-primary transition-colors rounded-lg text-sm font-medium"
+        >
+          <TerminalSquare className="w-4 h-4" /> Developer Mode
         </button>
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-cards border border-borders/50">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
