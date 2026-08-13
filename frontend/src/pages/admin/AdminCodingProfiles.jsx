@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { portfolioService } from '../../services/portfolioService';
-import { Plus, Edit2, Trash2, Save, X, ArrowUp, ArrowDown, CheckCircle2, XCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, ArrowUp, ArrowDown, CheckCircle2, XCircle, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const PRESET_ICONS = [
+  { id: 'leetcode', label: 'LeetCode (Built-in)' },
+  { id: 'hackerrank', label: 'HackerRank (Built-in)' },
+  { id: 'geeksforgeeks', label: 'GeeksforGeeks (Built-in)' },
+  { id: 'github', label: 'GitHub (Built-in)' },
+  { id: 'code', label: 'Code Icon' },
+  { id: 'terminal', label: 'Terminal Icon' },
+  { id: 'custom', label: 'Custom Image URL (Flaticon / Web)' }
+];
 
 export default function AdminCodingProfiles() {
   const [profiles, setProfiles] = useState([]);
@@ -10,13 +20,11 @@ export default function AdminCodingProfiles() {
   
   // Editor state
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ platform: '', username: '', url: '', icon: 'code', enabled: true });
+  const [editForm, setEditForm] = useState({ platform: '', username: '', url: '', icon: 'code', customIconUrl: '', enabled: true });
   
   // New profile state
   const [isAdding, setIsAdding] = useState(false);
-  const [newForm, setNewForm] = useState({ platform: '', username: '', url: '', icon: 'code', enabled: true });
-
-  const icons = ["github", "code", "terminal"];
+  const [newForm, setNewForm] = useState({ platform: '', username: '', url: '', icon: 'code', customIconUrl: '', enabled: true });
 
   useEffect(() => {
     loadProfiles();
@@ -33,14 +41,34 @@ export default function AdminCodingProfiles() {
     }
   };
 
-  const handleSaveProfile = async (profileData) => {
+  const isUrl = (str) => str && (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('data:'));
+
+  const preparePayload = (form) => {
+    const finalIcon = form.icon === 'custom' ? (form.customIconUrl.trim() || 'code') : (form.icon || 'code');
+    return {
+      platform: form.platform,
+      username: form.username,
+      url: form.url,
+      icon: finalIcon,
+      enabled: form.enabled,
+      id: form.id
+    };
+  };
+
+  const handleSaveProfile = async (form) => {
+    const payload = preparePayload(form);
+    if (!payload.platform.trim() || !payload.url.trim()) {
+      toast.error("Platform and URL are required");
+      return;
+    }
+
     try {
-      await portfolioService.saveCodingProfile(profileData);
+      await portfolioService.saveCodingProfile(payload);
       toast.success("Profile saved successfully!");
       loadProfiles();
       setEditingId(null);
       setIsAdding(false);
-      setNewForm({ platform: '', username: '', url: '', icon: 'code', enabled: true });
+      setNewForm({ platform: '', username: '', url: '', icon: 'code', customIconUrl: '', enabled: true });
     } catch (error) {
       toast.error("Failed to save profile");
     }
@@ -76,7 +104,6 @@ export default function AdminCodingProfiles() {
     const newProfiles = [...profiles];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     
-    // Swap
     [newProfiles[index], newProfiles[targetIndex]] = [newProfiles[targetIndex], newProfiles[index]];
     
     setProfiles(newProfiles);
@@ -92,8 +119,18 @@ export default function AdminCodingProfiles() {
     }
   };
 
+  const startEdit = (profile) => {
+    setEditingId(profile.id);
+    const custom = isUrl(profile.icon);
+    setEditForm({
+      ...profile,
+      icon: custom ? 'custom' : (profile.icon || 'code'),
+      customIconUrl: custom ? profile.icon : ''
+    });
+  };
+
   if (loading) {
-    return <div className="animate-pulse h-64 bg-cards/50 rounded-2xl border border-borders/50 flex items-center justify-center">Loading profiles...</div>;
+    return <div className="animate-pulse h-64 bg-cards/50 rounded-2xl border border-borders/50 flex items-center justify-center text-text/70">Loading profiles...</div>;
   }
 
   return (
@@ -101,7 +138,7 @@ export default function AdminCodingProfiles() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-text">Coding Profiles</h1>
-          <p className="text-text/60 mt-1">Manage your programming platform links and profiles.</p>
+          <p className="text-text/60 mt-1">Manage your programming platform links and custom icons (Flaticon, Web Image URLs, or built-in presets).</p>
         </div>
         <button 
           onClick={() => setIsAdding(true)}
@@ -120,7 +157,7 @@ export default function AdminCodingProfiles() {
                 <th className="p-4 font-semibold text-text/70 w-16">Order</th>
                 <th className="p-4 font-semibold text-text/70">Platform</th>
                 <th className="p-4 font-semibold text-text/70">Details</th>
-                <th className="p-4 font-semibold text-text/70 w-32">Icon</th>
+                <th className="p-4 font-semibold text-text/70 w-64">Icon Configuration</th>
                 <th className="p-4 font-semibold text-text/70 w-24">Status</th>
                 <th className="p-4 font-semibold text-text/70 w-32 text-right">Actions</th>
               </tr>
@@ -144,7 +181,7 @@ export default function AdminCodingProfiles() {
                         value={newForm.platform}
                         onChange={e => setNewForm({...newForm, platform: e.target.value})}
                         className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none font-bold"
-                        placeholder="e.g. LeetCode"
+                        placeholder="e.g. CodeChef"
                         autoFocus
                       />
                     </td>
@@ -155,7 +192,7 @@ export default function AdminCodingProfiles() {
                           value={newForm.username}
                           onChange={e => setNewForm({...newForm, username: e.target.value})}
                           className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none"
-                          placeholder="Username"
+                          placeholder="Username (Optional)"
                         />
                         <input 
                           type="url" 
@@ -166,14 +203,26 @@ export default function AdminCodingProfiles() {
                         />
                       </div>
                     </td>
-                    <td className="p-4 align-top pt-6">
-                      <select 
-                        value={newForm.icon}
-                        onChange={e => setNewForm({...newForm, icon: e.target.value})}
-                        className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none text-text"
-                      >
-                        {icons.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
+                    <td className="p-4 align-top">
+                      <div className="space-y-2">
+                        <select 
+                          value={newForm.icon}
+                          onChange={e => setNewForm({...newForm, icon: e.target.value})}
+                          className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none text-text text-sm"
+                        >
+                          {PRESET_ICONS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                        </select>
+
+                        {newForm.icon === 'custom' && (
+                          <input 
+                            type="url"
+                            value={newForm.customIconUrl}
+                            onChange={e => setNewForm({...newForm, customIconUrl: e.target.value})}
+                            className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none text-xs text-text"
+                            placeholder="Paste Flaticon / Image URL (https://...)"
+                          />
+                        )}
+                      </div>
                     </td>
                     <td className="p-4 align-top pt-6">
                       <button onClick={() => setNewForm({...newForm, enabled: !newForm.enabled})}>
@@ -243,7 +292,7 @@ export default function AdminCodingProfiles() {
                       </div>
                     ) : (
                       <div className="space-y-1">
-                        <p className="text-sm text-text/70">{profile.username}</p>
+                        {profile.username && <p className="text-sm text-text/70">{profile.username}</p>}
                         <a href={profile.url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline truncate block max-w-xs">{profile.url}</a>
                       </div>
                     )}
@@ -251,17 +300,38 @@ export default function AdminCodingProfiles() {
                   
                   <td className="p-4 align-top pt-6">
                     {editingId === profile.id ? (
-                      <select 
-                        value={editForm.icon}
-                        onChange={e => setEditForm({...editForm, icon: e.target.value})}
-                        className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none text-text"
-                      >
-                        {icons.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
+                      <div className="space-y-2">
+                        <select 
+                          value={editForm.icon}
+                          onChange={e => setEditForm({...editForm, icon: e.target.value})}
+                          className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none text-text text-sm"
+                        >
+                          {PRESET_ICONS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                        </select>
+
+                        {editForm.icon === 'custom' && (
+                          <input 
+                            type="url"
+                            value={editForm.customIconUrl}
+                            onChange={e => setEditForm({...editForm, customIconUrl: e.target.value})}
+                            className="w-full p-2 bg-background border border-borders rounded-lg focus:border-primary focus:outline-none text-xs text-text"
+                            placeholder="Paste Flaticon / Image URL (https://...)"
+                          />
+                        )}
+                      </div>
                     ) : (
-                      <span className="px-2.5 py-1 bg-background border border-borders/50 rounded-md text-xs text-text/70 capitalize">
-                        {profile.icon}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {isUrl(profile.icon) ? (
+                          <div className="flex items-center gap-2 p-1.5 bg-background border border-borders/50 rounded-lg">
+                            <img src={profile.icon} alt={profile.platform} className="w-5 h-5 object-contain" />
+                            <span className="text-xs text-text/60 truncate max-w-[120px]">Custom Image</span>
+                          </div>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-background border border-borders/50 rounded-md text-xs text-text/70 capitalize">
+                            {profile.icon || 'code'}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </td>
                   
@@ -297,7 +367,7 @@ export default function AdminCodingProfiles() {
                     ) : (
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
-                          onClick={() => { setEditingId(profile.id); setEditForm(profile); }}
+                          onClick={() => startEdit(profile)}
                           className="p-2 bg-background border border-borders text-text/70 rounded-lg hover:text-primary hover:border-primary/50 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
