@@ -4,14 +4,17 @@ import { portfolioService } from '../../services/portfolioService';
 import { Trophy } from 'lucide-react';
 
 export function Timeline() {
-  const [achievementsData, setAchievementsData] = useState([]);
+  // Local-First: Immediate synchronous fallback hydration
+  const [achievementsData, setAchievementsData] = useState(() => portfolioService.getLocalAchievements());
 
   useEffect(() => {
-    const loadData = async () => {
-      const data = await portfolioService.getAchievements();
-      setAchievementsData(data);
-    };
-    loadData();
+    let isMounted = true;
+    portfolioService.getAchievements().then((data) => {
+      if (isMounted && Array.isArray(data) && data.length > 0) {
+        setAchievementsData(data);
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
   return (
@@ -24,7 +27,7 @@ export function Timeline() {
       <div className="relative pl-6 md:pl-10 border-l-2 border-borders/50 space-y-12">
         {achievementsData.map((item, index) => (
           <motion.div 
-            key={index}
+            key={item.id || index}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}

@@ -1,6 +1,8 @@
-import api from './api';
+import { apiRequest } from './apiClient';
 
 export const submitContactForm = async (contactData) => {
-  const response = await api.post('/api/contact', contactData);
-  return response.data;
+  return apiRequest('/contact', {
+    method: 'POST',
+    body: JSON.stringify(contactData),
+  });
 };

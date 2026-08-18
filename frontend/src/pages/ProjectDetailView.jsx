@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { portfolioService } from '../services/portfolioService';
 import { ArchitectureDiagram } from '../components/projects/ArchitectureDiagram';
 import { ArrowLeft, ExternalLink, CheckCircle2, AlertTriangle, Lightbulb, Server, Code, Blocks, Loader2 } from 'lucide-react';
@@ -21,23 +21,31 @@ const itemVariants = {
 
 export function ProjectDetailView() {
   const { id } = useParams();
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Local-First: Synchronously load matching project from local/cache data
+  const [project, setProject] = useState(() => portfolioService.getLocalProjectById(id));
+  const [loading, setLoading] = useState(() => !portfolioService.getLocalProjectById(id));
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const loadProject = async () => {
-      setLoading(true);
-      const data = await portfolioService.getProjectById(id);
-      setProject(data);
-      setLoading(false);
-    };
-    loadProject();
+    let isMounted = true;
+
+    // Optional background check for dynamic changes
+    portfolioService.getProjectById(id).then((data) => {
+      if (isMounted) {
+        if (data) setProject(data);
+        setLoading(false);
+      }
+    }).catch(() => {
+      if (isMounted) setLoading(false);
+    });
+
+    return () => { isMounted = false; };
   }, [id]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-[50vh] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
@@ -56,7 +64,7 @@ export function ProjectDetailView() {
     >
       {/* Back Button */}
       <motion.div variants={itemVariants}>
-        <Link to="/projects" className="inline-flex items-center gap-2 text-sm text-text/70 hover:text-primary transition-colors group">
+        <Link to="/#projects" className="inline-flex items-center gap-2 text-sm text-text/70 hover:text-primary transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Projects
         </Link>
       </motion.div>
@@ -79,12 +87,22 @@ export function ProjectDetailView() {
         
         <div className="flex flex-wrap items-center gap-4 pt-6">
           {project.githubUrl && (
-            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="group flex items-center gap-2 px-6 py-3 bg-cards/80 backdrop-blur-md border border-borders hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all shadow-lg hover:-translate-y-1">
+            <a 
+              href={project.githubUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="group flex items-center gap-2 px-6 py-3 bg-cards/80 backdrop-blur-md border border-borders hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all shadow-lg hover:-translate-y-1"
+            >
               <FaGithub className="w-5 h-5 group-hover:scale-110 transition-transform" /> View Repository
             </a>
           )}
           {project.liveUrl && (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="group flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] hover:-translate-y-1">
+            <a 
+              href={project.liveUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="group flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] hover:-translate-y-1"
+            >
               <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform" /> Live Demo
             </a>
           )}
@@ -106,7 +124,7 @@ export function ProjectDetailView() {
             <Code className="w-6 h-6 text-secondary" /> Tech Stack
           </h2>
           <ul className="flex flex-wrap gap-2 p-6 rounded-2xl border border-borders bg-cards/50 backdrop-blur-md h-full content-start hover:border-secondary/30 transition-colors">
-            {project.technologies.map((tech, idx) => (
+            {(project.technologies || []).map((tech, idx) => (
               <motion.li 
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -152,7 +170,7 @@ export function ProjectDetailView() {
           <CheckCircle2 className="w-6 h-6 text-primary" /> Key Features
         </h2>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {project.features.map((feature, i) => (
+          {(project.features || []).map((feature, i) => (
             <motion.li 
               initial={{ opacity: 0, x: -10 }}
               whileInView={{ opacity: 1, x: 0 }}

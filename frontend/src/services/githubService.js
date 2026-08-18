@@ -1,33 +1,63 @@
-import api from './api';
+import { apiRequest, cacheHelper } from './apiClient';
 
 export const githubService = {
   getProfile: async () => {
-    const response = await api.get('/api/github/profile');
-    return response.data;
+    try {
+      const data = await apiRequest('/github/profile');
+      if (data) cacheHelper.set('gh_profile', data);
+      return data;
+    } catch {
+      return cacheHelper.get('gh_profile');
+    }
   },
   
   getRepositories: async () => {
-    const response = await api.get('/api/github/repositories');
-    return response.data;
+    try {
+      const data = await apiRequest('/github/repositories');
+      if (data) cacheHelper.set('gh_repos', data);
+      return data || [];
+    } catch {
+      return cacheHelper.get('gh_repos') || [];
+    }
   },
 
   getPinnedRepositories: async () => {
-    const response = await api.get('/api/github/pinned');
-    return response.data;
+    try {
+      const data = await apiRequest('/github/pinned');
+      if (data) cacheHelper.set('gh_pinned', data);
+      return data || [];
+    } catch {
+      return cacheHelper.get('gh_pinned') || [];
+    }
   },
 
   getStatistics: async () => {
-    const response = await api.get('/api/github/statistics');
-    return response.data;
+    try {
+      const data = await apiRequest('/github/statistics');
+      if (data) cacheHelper.set('gh_stats', data);
+      return data;
+    } catch {
+      return cacheHelper.get('gh_stats');
+    }
   },
 
   getLanguages: async () => {
-    const response = await api.get('/api/github/languages');
-    return response.data;
+    try {
+      const data = await apiRequest('/github/languages');
+      if (data) cacheHelper.set('gh_languages', data);
+      return data || [];
+    } catch {
+      return cacheHelper.get('gh_languages') || [];
+    }
   },
 
   getActivity: async () => {
-    const response = await api.get('/api/github/activity');
-    return response.data;
+    try {
+      const data = await apiRequest('/github/activity');
+      if (data) cacheHelper.set('gh_activity', data);
+      return data || [];
+    } catch {
+      return cacheHelper.get('gh_activity') || [];
+    }
   }
 };

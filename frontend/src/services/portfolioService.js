@@ -1,211 +1,242 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+import { apiRequest, cacheHelper } from './apiClient';
 
-const getHeaders = () => {
-    const headers = {
-        'Content-Type': 'application/json',
-    };
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-    return headers;
-};
-
-const handleResponse = async (response) => {
-    if (!response.ok) {
-        if (response.status === 401) {
-            localStorage.removeItem('admin_token');
-            window.location.href = '/admin/login';
-        }
-        const error = await response.text();
-        throw new Error(error);
-    }
-    const text = await response.text();
-    return text ? JSON.parse(text) : null;
-};
+// Local Static Fallbacks (Source of truth for instant, zero-delay rendering)
+import profileFallback from '../data/profile.json';
+import projectsFallback from '../data/projects.json';
+import skillsFallback from '../data/skills.json';
+import achievementsFallback from '../data/achievements.json';
+import codingProfilesFallback from '../data/codingProfiles.json';
 
 export const portfolioService = {
-  // --- Profile ---
+  // ==========================================
+  // Synchronous Local Fallbacks (Instant Load)
+  // ==========================================
+  getLocalProfile: () => cacheHelper.get('profile') || profileFallback,
+  getLocalProjects: () => cacheHelper.get('projects') || projectsFallback,
+  getLocalProjectById: (id) => {
+    const cachedProjects = cacheHelper.get('projects') || projectsFallback;
+    return cachedProjects.find(p => String(p.id) === String(id)) || null;
+  },
+  getLocalSkills: () => cacheHelper.get('skills') || skillsFallback,
+  getLocalAchievements: () => cacheHelper.get('achievements') || achievementsFallback,
+  getLocalCodingProfiles: () => cacheHelper.get('coding_profiles') || codingProfilesFallback,
+
+  // ==========================================
+  // Asynchronous Fetchers (With Graceful Fallback)
+  // ==========================================
   getProfile: async () => {
-      const response = await fetch(`${API_URL}/portfolio/profile`);
-      return handleResponse(response);
-  },
-  updateProfile: async (profileData) => {
-      const response = await fetch(`${API_URL}/admin/portfolio/profile`, {
-          method: 'PUT',
-          headers: getHeaders(),
-          body: JSON.stringify(profileData),
-      });
-      return handleResponse(response);
+    try {
+      const data = await apiRequest('/portfolio/profile');
+      if (data && data.name) {
+        cacheHelper.set('profile', data);
+        return data;
+      }
+    } catch {
+      // Backend offline or sleeping: gracefully retain local/cached data
+    }
+    return cacheHelper.get('profile') || profileFallback;
   },
 
-  // --- Projects ---
   getProjects: async () => {
-      const response = await fetch(`${API_URL}/portfolio/projects`);
-      return handleResponse(response);
+    try {
+      const data = await apiRequest('/portfolio/projects');
+      if (Array.isArray(data) && data.length > 0) {
+        cacheHelper.set('projects', data);
+        return data;
+      }
+    } catch {
+      // Backend offline
+    }
+    return cacheHelper.get('projects') || projectsFallback;
   },
+
   getProjectById: async (id) => {
-      const response = await fetch(`${API_URL}/portfolio/projects/${id}`);
-      return handleResponse(response);
-  },
-  saveProject: async (projectData) => {
-      const isNew = !projectData.id;
-      const url = isNew ? `${API_URL}/admin/portfolio/projects` : `${API_URL}/admin/portfolio/projects/${projectData.id}`;
-      const method = isNew ? 'POST' : 'PUT';
-      
-      const response = await fetch(url, {
-          method,
-          headers: getHeaders(),
-          body: JSON.stringify({
-            ...projectData,
-            id: isNew ? `proj-${Date.now()}` : projectData.id
-          }),
-      });
-      return handleResponse(response);
-  },
-  deleteProject: async (id) => {
-      const response = await fetch(`${API_URL}/admin/portfolio/projects/${id}`, {
-          method: 'DELETE',
-          headers: getHeaders()
-      });
-      return handleResponse(response);
+    try {
+      const data = await apiRequest(`/portfolio/projects/${id}`);
+      if (data && data.title) {
+        return data;
+      }
+    } catch {
+      // Fall back to local project matching id
+    }
+    const projects = cacheHelper.get('projects') || projectsFallback;
+    return projects.find(p => String(p.id) === String(id)) || null;
   },
 
-  // --- Skills ---
   getSkills: async () => {
-      const response = await fetch(`${API_URL}/portfolio/skills`);
-      return handleResponse(response);
-  },
-  saveSkill: async (skillData) => {
-      const isNew = !skillData.id || String(skillData.id).startsWith('skill-');
-      const url = isNew ? `${API_URL}/admin/portfolio/skills` : `${API_URL}/admin/portfolio/skills/${skillData.id}`;
-      const method = isNew ? 'POST' : 'PUT';
-      
-      const payload = { ...skillData };
-      if (isNew) delete payload.id; // DB auto-generates ID
-
-      const response = await fetch(url, {
-          method,
-          headers: getHeaders(),
-          body: JSON.stringify(payload),
-      });
-      return handleResponse(response);
-  },
-  deleteSkill: async (id) => {
-      const response = await fetch(`${API_URL}/admin/portfolio/skills/${id}`, {
-          method: 'DELETE',
-          headers: getHeaders()
-      });
-      return handleResponse(response);
+    try {
+      const data = await apiRequest('/portfolio/skills');
+      if (Array.isArray(data) && data.length > 0) {
+        cacheHelper.set('skills', data);
+        return data;
+      }
+    } catch {
+      // Backend offline
+    }
+    return cacheHelper.get('skills') || skillsFallback;
   },
 
-  // --- Achievements ---
   getAchievements: async () => {
-      const response = await fetch(`${API_URL}/portfolio/achievements`);
-      return handleResponse(response);
-  },
-  saveAchievement: async (achievementData) => {
-      const isNew = !achievementData.id || String(achievementData.id).startsWith('ach-');
-      const url = isNew ? `${API_URL}/admin/portfolio/achievements` : `${API_URL}/admin/portfolio/achievements/${achievementData.id}`;
-      const method = isNew ? 'POST' : 'PUT';
-      
-      const payload = { ...achievementData };
-      if (isNew) delete payload.id;
-
-      const response = await fetch(url, {
-          method,
-          headers: getHeaders(),
-          body: JSON.stringify(payload),
-      });
-      return handleResponse(response);
-  },
-  deleteAchievement: async (id) => {
-      const response = await fetch(`${API_URL}/admin/portfolio/achievements/${id}`, {
-          method: 'DELETE',
-          headers: getHeaders()
-      });
-      return handleResponse(response);
-  },
-  resetAchievements: async () => {
-      // Just fetch it again, no local reset
-      return portfolioService.getAchievements();
+    try {
+      const data = await apiRequest('/portfolio/achievements');
+      if (Array.isArray(data) && data.length > 0) {
+        cacheHelper.set('achievements', data);
+        return data;
+      }
+    } catch {
+      // Backend offline
+    }
+    return cacheHelper.get('achievements') || achievementsFallback;
   },
 
-  // --- Coding Profiles ---
   getCodingProfiles: async () => {
-      const response = await fetch(`${API_URL}/portfolio/coding-profiles`);
-      return handleResponse(response);
+    try {
+      const data = await apiRequest('/portfolio/coding-profiles');
+      if (Array.isArray(data) && data.length > 0) {
+        cacheHelper.set('coding_profiles', data);
+        return data;
+      }
+    } catch {
+      // Backend offline
+    }
+    return cacheHelper.get('coding_profiles') || codingProfilesFallback;
   },
+
+  // ==========================================
+  // Admin CMS Operations (Protected by JWT)
+  // ==========================================
+  updateProfile: async (profileData) => {
+    const data = await apiRequest('/admin/portfolio/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+    cacheHelper.set('profile', data);
+    return data;
+  },
+
+  saveProject: async (projectData) => {
+    const isNew = !projectData.id;
+    const endpoint = isNew ? '/admin/portfolio/projects' : `/admin/portfolio/projects/${projectData.id}`;
+    const method = isNew ? 'POST' : 'PUT';
+    
+    return apiRequest(endpoint, {
+      method,
+      body: JSON.stringify({
+        ...projectData,
+        id: isNew ? `proj-${Date.now()}` : projectData.id,
+      }),
+    });
+  },
+
+  deleteProject: async (id) => {
+    return apiRequest(`/admin/portfolio/projects/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  saveSkill: async (skillData) => {
+    const isNew = !skillData.id || String(skillData.id).startsWith('skill-');
+    const endpoint = isNew ? '/admin/portfolio/skills' : `/admin/portfolio/skills/${skillData.id}`;
+    const method = isNew ? 'POST' : 'PUT';
+
+    const payload = { ...skillData };
+    if (isNew) delete payload.id;
+
+    return apiRequest(endpoint, {
+      method,
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteSkill: async (id) => {
+    return apiRequest(`/admin/portfolio/skills/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  saveAchievement: async (achievementData) => {
+    const isNew = !achievementData.id || String(achievementData.id).startsWith('ach-');
+    const endpoint = isNew ? '/admin/portfolio/achievements' : `/admin/portfolio/achievements/${achievementData.id}`;
+    const method = isNew ? 'POST' : 'PUT';
+
+    const payload = { ...achievementData };
+    if (isNew) delete payload.id;
+
+    return apiRequest(endpoint, {
+      method,
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteAchievement: async (id) => {
+    return apiRequest(`/admin/portfolio/achievements/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   saveCodingProfile: async (profileData) => {
-      const isNew = !profileData.id;
-      const url = isNew ? `${API_URL}/admin/portfolio/coding-profiles` : `${API_URL}/admin/portfolio/coding-profiles/${profileData.id}`;
-      const method = isNew ? 'POST' : 'PUT';
-      
-      const payload = { ...profileData };
-      if (isNew) delete payload.id;
+    const isNew = !profileData.id;
+    const endpoint = isNew ? '/admin/portfolio/coding-profiles' : `/admin/portfolio/coding-profiles/${profileData.id}`;
+    const method = isNew ? 'POST' : 'PUT';
 
-      const response = await fetch(url, {
-          method,
-          headers: getHeaders(),
-          body: JSON.stringify(payload),
-      });
-      return handleResponse(response);
+    const payload = { ...profileData };
+    if (isNew) delete payload.id;
+
+    return apiRequest(endpoint, {
+      method,
+      body: JSON.stringify(payload),
+    });
   },
+
   deleteCodingProfile: async (id) => {
-      const response = await fetch(`${API_URL}/admin/portfolio/coding-profiles/${id}`, {
-          method: 'DELETE',
-          headers: getHeaders()
-      });
-      return handleResponse(response);
+    return apiRequest(`/admin/portfolio/coding-profiles/${id}`, {
+      method: 'DELETE',
+    });
   },
 
-  // --- Messages ---
+  // ==========================================
+  // Messages & Contact
+  // ==========================================
   getMessages: async () => {
-      const response = await fetch(`${API_URL}/admin/messages`, { headers: getHeaders() });
-      return handleResponse(response);
+    return apiRequest('/admin/messages');
   },
+
   sendMessage: async (messageData) => {
-      const response = await fetch(`${API_URL}/contact`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(messageData),
-      });
-      return handleResponse(response);
+    return apiRequest('/contact', {
+      method: 'POST',
+      body: JSON.stringify(messageData),
+    });
   },
+
   markMessageRead: async (id) => {
-      const response = await fetch(`${API_URL}/admin/messages/${id}/read`, {
-          method: 'PUT',
-          headers: getHeaders(),
-      });
-      return handleResponse(response);
+    return apiRequest(`/admin/messages/${id}/read`, {
+      method: 'PUT',
+    });
   },
+
   deleteMessage: async (id) => {
-      const response = await fetch(`${API_URL}/admin/messages/${id}`, {
-          method: 'DELETE',
-          headers: getHeaders(),
-      });
-      return handleResponse(response);
-  }
+    return apiRequest(`/admin/messages/${id}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 export const authService = {
-    login: async (email, password) => {
-        const response = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await handleResponse(response);
-        if (data.token) {
-            localStorage.setItem('admin_token', data.token);
-        }
-        return data;
-    },
-    logout: () => {
-        localStorage.removeItem('admin_token');
-        window.location.href = '/admin/login';
-    },
-    isAuthenticated: () => {
-        return !!localStorage.getItem('admin_token');
+  login: async (email, password) => {
+    const data = await apiRequest('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    if (data?.token) {
+      localStorage.setItem('admin_token', data.token);
     }
+    return data;
+  },
+  logout: () => {
+    localStorage.removeItem('admin_token');
+    window.location.href = '/admin/login';
+  },
+  isAuthenticated: () => {
+    return !!localStorage.getItem('admin_token');
+  },
 };

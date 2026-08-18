@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Loader2, ArrowRight, Phone } from 'lucide-react';
+import { Mail, MapPin, Loader2, ArrowRight, Phone, AlertCircle, ExternalLink } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { portfolioService } from '../services/portfolioService';
 
 export default function ContactView() {
-  const [profileData, setProfileData] = useState(null);
+  // Local-First: Immediate synchronous fallback hydration
+  const [profileData, setProfileData] = useState(() => portfolioService.getLocalProfile());
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,13 +16,14 @@ export default function ContactView() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [submitFallbackNotice, setSubmitFallbackNotice] = useState(false);
 
   useEffect(() => {
-    const loadProfile = async () => {
-      const data = await portfolioService.getProfile();
-      setProfileData(data);
-    };
-    loadProfile();
+    let isMounted = true;
+    portfolioService.getProfile().then((data) => {
+      if (isMounted && data) setProfileData(data);
+    }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
   const validateForm = () => {
@@ -44,6 +46,9 @@ export default function ContactView() {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
     }
+    if (submitFallbackNotice) {
+      setSubmitFallbackNotice(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -51,21 +56,27 @@ export default function ContactView() {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setSubmitFallbackNotice(false);
+
     try {
       await portfolioService.sendMessage(formData);
-      toast.success('Thank you! Your message has been received successfully. (Locally saved)', {
+      toast.success('Thank you! Your message has been sent successfully.', {
         duration: 5000,
         position: 'bottom-center',
       });
       setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (error) {
-      toast.error('Failed to send message. Please try again later.');
+    } catch {
+      // Backend unavailable / sleeping fallback
+      setSubmitFallbackNotice(true);
+      toast.error('Server unavailable. Please reach out directly via Email or LinkedIn below.', {
+        duration: 6000,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (!profileData) return null;
+  const mailtoUrl = `mailto:${profileData.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(`Hi ${profileData.name},\n\n${formData.message}\n\nFrom: ${formData.name} (${formData.email})`)}`;
 
   return (
     <div className="space-y-12 pb-4 max-w-5xl mx-auto">
@@ -87,7 +98,7 @@ export default function ContactView() {
           transition={{ delay: 0.1 }}
           className="text-lg text-text/70 max-w-2xl leading-relaxed mx-auto md:mx-0 font-light"
         >
-          I'm currently looking for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!
+          I'm currently open to new software engineering opportunities. Whether you have a question or want to discuss a project, feel free to reach out!
         </motion.p>
       </div>
 
@@ -117,7 +128,7 @@ export default function ContactView() {
             </div>
             <div className="relative z-10 flex-1">
               <p className="text-sm font-bold text-text/50 uppercase tracking-widest mb-1">Phone</p>
-              <p className="text-text font-medium group-hover:text-green-500 transition-colors">{profileData.phone || 'Not provided'}</p>
+              <p className="text-text font-medium group-hover:text-green-500 transition-colors">{profileData.phone || 'Available on request'}</p>
             </div>
             <ArrowRight className="w-5 h-5 text-text/30 group-hover:text-green-500 group-hover:translate-x-1 opacity-0 group-hover:opacity-100 transition-all relative z-10" />
           </a>
@@ -133,11 +144,21 @@ export default function ContactView() {
           </div>
 
           <div className="flex gap-4">
-            <a href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} target="_blank" rel="noreferrer" className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-text/50 hover:bg-text/5 transition-all duration-300">
+            <a 
+              href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-text/50 hover:bg-text/5 transition-all duration-300"
+            >
               <FaGithub className="w-8 h-8 text-text/70 group-hover:text-text group-hover:scale-110 transition-all" />
               <span className="text-sm font-medium text-text/70 group-hover:text-text transition-colors">GitHub</span>
             </a>
-            <a href={profileData.linkedin || '#'} target="_blank" rel="noreferrer" className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
+            <a 
+              href={profileData.linkedin || 'https://www.linkedin.com'} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+            >
               <FaLinkedin className="w-8 h-8 text-text/70 group-hover:text-primary group-hover:scale-110 transition-all" />
               <span className="text-sm font-medium text-text/70 group-hover:text-primary transition-colors">LinkedIn</span>
             </a>
@@ -148,9 +169,40 @@ export default function ContactView() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="lg:col-span-3 glass-card p-6 md:p-8 space-y-6 rounded-3xl"
+          className="lg:col-span-3 glass-card p-6 md:p-8 space-y-6 rounded-3xl relative"
           onSubmit={handleSubmit}
         >
+          {submitFallbackNotice && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-5 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-text space-y-3"
+            >
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-text/90 leading-relaxed font-normal">
+                  Unable to send your message through the server right now. Please contact me directly via email or LinkedIn.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3 pt-1">
+                <a 
+                  href={mailtoUrl}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-semibold rounded-xl hover:bg-primary/90 transition-all shadow-md"
+                >
+                  <Mail className="w-3.5 h-3.5" /> Send Direct Email <ExternalLink className="w-3 h-3" />
+                </a>
+                <a 
+                  href={profileData.linkedin || 'https://www.linkedin.com'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-cards border border-borders text-text hover:text-primary hover:border-primary/50 text-xs font-semibold rounded-xl transition-all"
+                >
+                  <FaLinkedin className="w-3.5 h-3.5 text-[#0A66C2]" /> Open LinkedIn <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </motion.div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-text/90 ml-1">Name <span className="text-primary">*</span></label>
@@ -190,7 +242,7 @@ export default function ContactView() {
               onChange={handleChange}
               disabled={isSubmitting}
               className={`w-full p-4 rounded-xl bg-background border ${errors.subject ? 'border-red-500/50 focus:border-red-500' : 'border-borders focus:border-primary'} text-text focus:outline-none transition-all focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]`} 
-              placeholder="Job Opportunity" 
+              placeholder="Engineering Opportunity" 
             />
             {errors.subject && <p className="text-xs text-red-500 mt-1 ml-1">{errors.subject}</p>}
           </div>

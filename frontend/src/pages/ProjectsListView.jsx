@@ -8,7 +8,7 @@ const CATEGORIES = ['All', 'Java / Spring Boot', 'AI / ML', 'Cloud', 'Full Stack
 
 const getProjectCategories = (project) => {
   const cats = ['All'];
-  const techString = project.technologies.join(' ').toLowerCase();
+  const techString = (project.technologies || []).join(' ').toLowerCase();
   
   if (techString.includes('java') || techString.includes('spring boot')) cats.push('Java / Spring Boot');
   if (techString.includes('ai') || techString.includes('ml') || techString.includes('python') || techString.includes('fastapi') || techString.includes('groq')) cats.push('AI / ML');
@@ -20,15 +20,20 @@ const getProjectCategories = (project) => {
 
 export function ProjectsListView() {
   const [activeFilter, setActiveFilter] = useState('All');
-  const [projectsData, setProjectsData] = useState([]);
+  // Local-First: Immediate synchronous fallback hydration
+  const [projectsData, setProjectsData] = useState(() => {
+    const local = portfolioService.getLocalProjects();
+    return (local || []).filter(p => p.visible !== false);
+  });
 
   useEffect(() => {
-    const loadData = async () => {
-      const data = await portfolioService.getProjects();
-      // Only show visible projects in the public view
-      setProjectsData(data.filter(p => p.visible !== false));
-    };
-    loadData();
+    let isMounted = true;
+    portfolioService.getProjects().then((data) => {
+      if (isMounted && Array.isArray(data) && data.length > 0) {
+        setProjectsData(data.filter(p => p.visible !== false));
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
   const filteredProjects = projectsData.filter(p => getProjectCategories(p).includes(activeFilter));

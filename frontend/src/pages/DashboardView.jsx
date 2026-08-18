@@ -11,15 +11,22 @@ import { portfolioService } from '../services/portfolioService';
 import { User, GraduationCap, Code, Rocket, Link as LinkIcon } from 'lucide-react';
 
 export function DashboardView() {
-  const [profilesData, setProfilesData] = useState([]);
+  // Local-First: Immediate synchronous fallback hydration
+  const [profilesData, setProfilesData] = useState(() => {
+    const local = portfolioService.getLocalCodingProfiles();
+    return (local || []).filter(p => p.enabled !== false);
+  });
 
   useEffect(() => {
-    const loadData = async () => {
-      const profiles = await portfolioService.getCodingProfiles();
-      setProfilesData(profiles);
-    };
-    loadData();
+    let isMounted = true;
+    portfolioService.getCodingProfiles().then((data) => {
+      if (isMounted && Array.isArray(data) && data.length > 0) {
+        setProfilesData(data.filter(p => p.enabled !== false));
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
+
   return (
     <div className="space-y-24 pb-20">
       <div id="home">
@@ -99,7 +106,7 @@ export function DashboardView() {
       </div>
 
       <div className="pt-10" id="projects">
-        <ProjectsListView embedded={true} />
+        <ProjectsListView />
       </div>
 
       <div className="pt-10" id="achievements">
@@ -107,17 +114,19 @@ export function DashboardView() {
       </div>
 
       {/* Coding Profiles */}
-      <section className="space-y-8">
-        <div className="flex items-center gap-3 text-text">
-          <LinkIcon className="w-8 h-8 text-secondary" />
-          <h2 className="text-3xl font-bold tracking-tight">Coding Profiles</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {profilesData.map((profile, idx) => (
-            <ProfileCard key={profile.platform} profile={profile} index={idx} />
-          ))}
-        </div>
-      </section>
+      {profilesData.length > 0 && (
+        <section className="space-y-8" id="coding-profiles">
+          <div className="flex items-center gap-3 text-text">
+            <LinkIcon className="w-8 h-8 text-secondary" />
+            <h2 className="text-3xl font-bold tracking-tight">Coding Profiles</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {profilesData.map((profile, idx) => (
+              <ProfileCard key={profile.id || profile.platform} profile={profile} index={idx} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="pt-10" id="contact">
         <ContactView />

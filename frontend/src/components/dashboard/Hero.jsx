@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Download, ArrowRight, Code2, Mail, FileText, Database } from 'lucide-react';
-import { FaGithub, FaLinkedin, FaJava, FaReact, FaAws, FaNodeJs, FaPython } from 'react-icons/fa';
+import { Download, ArrowRight, Code2, FileText } from 'lucide-react';
+import { FaGithub, FaLinkedin, FaJava, FaReact, FaAws, FaNodeJs } from 'react-icons/fa';
 import { portfolioService } from '../../services/portfolioService';
 import { Typewriter } from '../ui/Typewriter';
 import { resumeService } from '../../services/resumeService';
@@ -17,20 +17,24 @@ const FloatingBadge = ({ icon: Icon, delay, className }) => (
 );
 
 export function Hero() {
-  const [profileData, setProfileData] = useState(null);
+  // Local-First: Immediate synchronous fallback hydration
+  const [profileData, setProfileData] = useState(() => portfolioService.getLocalProfile());
 
   useEffect(() => {
-    const loadProfile = async () => {
-      const data = await portfolioService.getProfile();
-      setProfileData(data);
-    };
-    loadProfile();
+    // Optional asynchronous background enhancement (only updates if fresh data is received)
+    let isMounted = true;
+    portfolioService.getProfile().then((data) => {
+      if (isMounted && data) {
+        setProfileData(data);
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
-  if (!profileData) return null;
+  const resumeMeta = resumeService.getResumeMetadata();
 
   return (
-    <section className="flex flex-col md:flex-row items-center gap-10 py-16 relative">
+    <section className="flex flex-col md:flex-row items-center gap-10 py-16 relative" id="home">
       <div className="flex-1 space-y-8 z-10">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -53,7 +57,7 @@ export function Hero() {
           </span>
           <br />
           <span className="text-2xl md:text-3xl lg:text-4xl text-primary mt-2 block h-10">
-            <Typewriter words={profileData.roles} />
+            <Typewriter words={profileData.roles || ['Software Engineer', 'Full Stack Developer', 'Java Specialist']} />
           </span>
         </motion.h1>
 
@@ -77,7 +81,7 @@ export function Hero() {
           </a>
           <div className="flex items-center gap-2">
             <a 
-              href={resumeService.getResumeMetadata().path}
+              href={resumeMeta.path}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:bg-borders/50 text-text font-medium rounded-xl transition-all hover:border-primary/50"
@@ -85,18 +89,31 @@ export function Hero() {
               <FileText className="w-4 h-4" /> Resume
             </a>
             <a 
-              href={resumeService.getResumeMetadata().path}
-              download={resumeService.getResumeMetadata().name}
+              href={resumeMeta.path}
+              download={resumeMeta.name}
               className="flex items-center justify-center px-4 py-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:bg-borders/50 text-text font-medium rounded-xl transition-all hover:border-primary/50"
-              title="Download PDF"
+              title="Download PDF Resume"
+              aria-label="Download PDF Resume"
             >
               <Download className="w-4 h-4" />
             </a>
           </div>
-          <a href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} target="_blank" rel="noreferrer" className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1">
+          <a 
+            href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1"
+            aria-label="GitHub Profile"
+          >
             <FaGithub className="w-5 h-5" />
           </a>
-          <a href={profileData.linkedin || '#'} target="_blank" rel="noreferrer" className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1">
+          <a 
+            href={profileData.linkedin || 'https://www.linkedin.com'} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1"
+            aria-label="LinkedIn Profile"
+          >
             <FaLinkedin className="w-5 h-5" />
           </a>
         </motion.div>
@@ -108,22 +125,26 @@ export function Hero() {
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="w-full md:w-5/12 max-w-[400px] aspect-square relative hidden md:block"
       >
-        {/* Decorative elements */}
+        {/* Decorative background glow */}
         <div className="absolute inset-4 bg-gradient-to-tr from-primary/30 to-secondary/10 rounded-full blur-3xl -z-10" />
         
-        {/* Floating Badges */}
+        {/* Floating Tech Badges */}
         <FloatingBadge icon={FaJava} delay={0} className="text-[#ED8B00] top-10 left-4" />
         <FloatingBadge icon={FaReact} delay={1} className="text-[#61DAFB] top-20 right-4" />
         <FloatingBadge icon={FaNodeJs} delay={2.5} className="text-[#339933] bottom-32 -left-4" />
         <FloatingBadge icon={FaAws} delay={1.5} className="text-[#FF9900] bottom-16 right-10" />
 
-        {/* Main Image Container */}
+        {/* Optimized Main Image Container */}
         <div className="absolute inset-8 rounded-full border border-borders/50 p-2 bg-background/50 backdrop-blur-sm z-10 overflow-visible">
            <div className="w-full h-full rounded-full overflow-hidden border border-borders/50 relative group">
              <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none" />
              <img 
                src={profileData.imageBase64 || "/yoges_profile.jpeg"} 
                alt={profileData.name || "Yogeswaran V"} 
+               width="350"
+               height="350"
+               loading="eager"
+               decoding="async"
                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
              />
            </div>

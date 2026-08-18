@@ -16,24 +16,29 @@ const itemVariants = {
   show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
 };
 
+const groupSkills = (data) => {
+  if (!Array.isArray(data)) return {};
+  return data.reduce((acc, skill) => {
+    if (!acc[skill.category]) acc[skill.category] = [];
+    if (skill.enabled !== false) {
+      acc[skill.category].push(skill.name);
+    }
+    return acc;
+  }, {});
+};
+
 export function TechRadar() {
-  const [skillsData, setSkillsData] = useState({});
+  // Local-First: Immediate synchronous fallback hydration
+  const [skillsData, setSkillsData] = useState(() => groupSkills(portfolioService.getLocalSkills()));
 
   useEffect(() => {
-    const loadData = async () => {
-      const data = await portfolioService.getSkills();
-      
-      // Group skills by category for the radar UI
-      const grouped = data.reduce((acc, skill) => {
-        if (!acc[skill.category]) acc[skill.category] = [];
-        if (skill.enabled !== false) { // Assuming we add enabled flag in admin
-          acc[skill.category].push(skill.name);
-        }
-        return acc;
-      }, {});
-      setSkillsData(grouped);
-    };
-    loadData();
+    let isMounted = true;
+    portfolioService.getSkills().then((data) => {
+      if (isMounted && Array.isArray(data) && data.length > 0) {
+        setSkillsData(groupSkills(data));
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
   return (
