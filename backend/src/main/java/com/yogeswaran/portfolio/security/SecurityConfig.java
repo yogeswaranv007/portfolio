@@ -60,12 +60,12 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/portfolio/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
+                auth.requestMatchers("/api/auth/**", "/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/portfolio/**", "/portfolio/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/contact", "/contact").permitAll()
                     .requestMatchers("/api/docs/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                    .requestMatchers("/api/portfolio/**").hasRole("ADMIN")
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/portfolio/**", "/portfolio/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             );
 
