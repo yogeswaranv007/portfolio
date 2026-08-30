@@ -3,14 +3,15 @@
  * Canonical Env Var: VITE_API_BASE_URL (with graceful fallback to VITE_API_URL or localhost)
  */
 
-const BASE_URL = (
+const rawBase = (
   import.meta.env.VITE_API_BASE_URL ||
   import.meta.env.VITE_API_URL ||
   'http://localhost:8080'
 ).replace(/\/+$/, '');
 
-// Ensure /api suffix if not already present on base
-export const API_BASE_URL = BASE_URL.endsWith('/api') ? BASE_URL : `${BASE_URL}/api`;
+// Normalizes HOST_URL (without /api) and API_BASE_URL (with exactly one /api)
+export const HOST_URL = rawBase.replace(/\/api$/, '');
+export const API_BASE_URL = `${HOST_URL}/api`;
 
 const DEFAULT_TIMEOUT_MS = 10000; // 10s timeout to avoid indefinite blocking
 
@@ -29,12 +30,22 @@ export const getAuthHeaders = () => {
 };
 
 /**
- * Fetch wrapper with timeout and error handling
+ * Fetch wrapper with URL normalization, timeout and error handling
  */
 export const apiRequest = async (endpoint, options = {}) => {
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
-  const timeoutMs = options.timeout || DEFAULT_TIMEOUT_MS;
+  let url;
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    url = endpoint;
+  } else {
+    let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    // Strip accidental leading /api if passed (prevents /api/api/...)
+    if (cleanEndpoint.startsWith('/api/')) {
+      cleanEndpoint = cleanEndpoint.replace(/^\/api/, '');
+    }
+    url = `${API_BASE_URL}${cleanEndpoint}`;
+  }
 
+  const timeoutMs = options.timeout || DEFAULT_TIMEOUT_MS;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -58,7 +69,14 @@ export const apiRequest = async (endpoint, options = {}) => {
         }
       }
       const errorText = await response.text().catch(() => 'Network response was not ok');
-      throw new Error(errorText || `HTTP ${response.status}`);
+      let errorMessage;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorJson.error || errorText;
+      } catch {
+        errorMessage = errorText;
+      }
+      throw new Error(errorMessage || `HTTP ${response.status}`);
     }
 
     const text = await response.text();
