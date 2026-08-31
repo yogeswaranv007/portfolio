@@ -12,11 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@lombok.extern.slf4j.Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<Map<String, String>> handleWebClientException(WebClientResponseException ex) {
-        // If GitHub API returns 404, 403 (Rate Limit), etc.
+        log.error("WebClient exception: {}", ex.getMessage());
         return ResponseEntity.status(ex.getStatusCode())
                 .body(Map.of("error", "GitHub API Error", "message", ex.getMessage()));
     }
@@ -39,7 +40,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
+        log.error("Unhandled exception occurred: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Internal Server Error", "message", "An unexpected error occurred."));
+                .body(Map.of("error", "Internal Server Error", "message", ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred."));
     }
 }
