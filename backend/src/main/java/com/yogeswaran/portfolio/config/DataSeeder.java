@@ -53,10 +53,18 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedAdminUser() {
-        if (adminUserRepository.findByEmail("admin@yogeswaran.dev").isEmpty()) {
+        var existingAdmin = adminUserRepository.findByEmail("admin@yogeswaran.dev");
+        if (existingAdmin.isPresent()) {
+            AdminUser admin = existingAdmin.get();
+            admin.setPasswordHash(passwordEncoder.encode("yogesAdmin!"));
+            admin.setEnabled(true);
+            admin.setRole("ADMIN");
+            adminUserRepository.save(admin);
+            log.info("Updated admin user password to yogesAdmin! for: admin@yogeswaran.dev");
+        } else {
             AdminUser admin = AdminUser.builder()
                     .email("admin@yogeswaran.dev")
-                    .passwordHash(passwordEncoder.encode("SecureAdminPassword!")) // Default password for initial setup
+                    .passwordHash(passwordEncoder.encode("yogesAdmin!"))
                     .role("ADMIN")
                     .enabled(true)
                     .build();
