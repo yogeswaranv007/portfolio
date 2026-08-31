@@ -33,6 +33,7 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         seedAdminUser();
+        seedSkills(); // Always sync latest skills catalog
         
         // Only seed if empty
         if (profileRepository.count() == 0) {
@@ -40,9 +41,6 @@ public class DataSeeder implements CommandLineRunner {
         }
         if (projectRepository.count() == 0) {
             seedProjects();
-        }
-        if (skillRepository.count() == 0) {
-            seedSkills();
         }
         if (achievementRepository.count() == 0) {
             seedAchievements();
@@ -131,13 +129,25 @@ public class DataSeeder implements CommandLineRunner {
                 List<Skill> skills = mapper.readValue(json, new TypeReference<List<Skill>>() {});
                 int order = 0;
                 for (Skill s : skills) {
-                    if (s.getIcon() == null || s.getIcon().isEmpty()) {
-                        s.setIcon("FaCode");
+                    var existingOpt = skillRepository.findByName(s.getName());
+                    if (existingOpt.isPresent()) {
+                        Skill existing = existingOpt.get();
+                        existing.setCategory(s.getCategory());
+                        existing.setDisplayOrder(order++);
+                        if (s.getIcon() != null && !s.getIcon().isEmpty()) {
+                            existing.setIcon(s.getIcon());
+                        }
+                        existing.setEnabled(s.isEnabled());
+                        skillRepository.save(existing);
+                    } else {
+                        if (s.getIcon() == null || s.getIcon().isEmpty()) {
+                            s.setIcon("FaCode");
+                        }
+                        s.setDisplayOrder(order++);
+                        skillRepository.save(s);
                     }
-                    s.setDisplayOrder(order++);
-                    skillRepository.save(s);
                 }
-                log.info("Seeded skills data from classpath JSON");
+                log.info("Synced and seeded total {} skills into database from classpath JSON", skills.size());
             }
         } catch (Exception e) {
             log.error("Failed to seed skills: {}", e.getMessage());
