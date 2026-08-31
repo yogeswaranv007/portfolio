@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { authService } from '../../services/portfolioService';
 import toast from 'react-hot-toast';
@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -70,20 +71,34 @@ export default function AdminLogin() {
           </div>
           <div>
             <label className="block text-sm font-semibold text-text/90 mb-2 ml-1">Password</label>
-            <input 
-              type="password" 
-              name="password"
-              id="admin-password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError('');
-              }}
-              className="w-full p-4 rounded-xl bg-background/50 border border-borders focus:border-primary text-text focus:outline-none transition-all focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]"
-              placeholder="Enter secure password"
-              required
-            />
+            <div className="relative">
+              <input 
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                id="admin-password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError('');
+                }}
+                className="w-full p-4 pr-12 rounded-xl bg-background/50 border border-borders focus:border-primary text-text focus:outline-none transition-all focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]"
+                placeholder="Enter secure password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-text/50 hover:text-text focus:outline-none transition-colors p-1"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             {error && (
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-sm mt-2 ml-1">
                 {error}

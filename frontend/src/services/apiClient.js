@@ -1,19 +1,29 @@
 /**
  * Centralized API Client for Backend Communication
- * Canonical Env Var: VITE_API_BASE_URL (with graceful fallback to VITE_API_URL or localhost)
+ * Auto-detects production backend URL when deployed to Vercel/production
  */
 
-const rawBase = (
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  'http://localhost:8080'
-).replace(/\/+$/, '');
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  if (import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.includes('localhost')) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // If running in browser and NOT on localhost/127.0.0.1, default to live production Render backend
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://portfolio-yogeswaran-v-2005.onrender.com/api';
+  }
+  return import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+};
+
+const rawBase = getBaseUrl().replace(/\/+$/, '');
 
 // Normalizes HOST_URL (without /api) and API_BASE_URL (with exactly one /api)
 export const HOST_URL = rawBase.replace(/\/api$/, '');
 export const API_BASE_URL = `${HOST_URL}/api`;
 
-const DEFAULT_TIMEOUT_MS = 10000; // 10s timeout to avoid indefinite blocking
+const DEFAULT_TIMEOUT_MS = 15000; // 15s timeout to allow Render cold start
 
 /**
  * Get headers including JWT Authorization token if present
@@ -84,7 +94,7 @@ export const apiRequest = async (endpoint, options = {}) => {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error.name === 'AbortError') {
-      throw new Error(`Request timed out after ${timeoutMs}ms`);
+      throw new Error(`Request timed out after ${timeoutMs}ms (Backend may be waking up)`);
     }
     throw error;
   }
