@@ -54,6 +54,9 @@ export default function AdminLogin() {
             <label className="block text-sm font-semibold text-text/90 mb-2 ml-1">Email</label>
             <input 
               type="email" 
+              name="username"
+              id="admin-email"
+              autoComplete="username"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -69,6 +72,9 @@ export default function AdminLogin() {
             <label className="block text-sm font-semibold text-text/90 mb-2 ml-1">Password</label>
             <input 
               type="password" 
+              name="password"
+              id="admin-password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
