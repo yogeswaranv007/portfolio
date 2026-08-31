@@ -23,8 +23,20 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        try {
+            String secret = (jwtSecret != null && !jwtSecret.isBlank()) 
+                    ? jwtSecret 
+                    : "8f2f84090b4d45548682057d62055627eb18d6a8f152d5b62b19280d908d0c2e36466f27b9c922a6bbec4b4c7317e08929e71e9a3b6f001f3724c08479e390c5";
+            byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+            if (keyBytes.length < 64) {
+                java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-512");
+                keyBytes = md.digest(keyBytes);
+            }
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            logger.error("Error generating JWT signing key: {}", e.getMessage());
+            return Keys.hmacShaKeyFor("8f2f84090b4d45548682057d62055627eb18d6a8f152d5b62b19280d908d0c2e36466f27b9c922a6bbec4b4c7317e08929e71e9a3b6f001f3724c08479e390c5".getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     public String generateJwtToken(Authentication authentication) {
