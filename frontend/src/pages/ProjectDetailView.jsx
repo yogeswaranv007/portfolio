@@ -1,28 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { portfolioService } from '../services/portfolioService';
-import { ArchitectureDiagram } from '../components/projects/ArchitectureDiagram';
-import { ArrowLeft, ExternalLink, CheckCircle2, AlertTriangle, Lightbulb, Server, Code, Blocks, Loader2 } from 'lucide-react';
+import { ProjectVisualPreview } from '../components/projects/ProjectVisualPreview';
+import { ArrowLeft, ExternalLink, CheckCircle2, Award, Sparkles } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
-};
 
 export function ProjectDetailView() {
   const { id } = useParams();
-  
-  // Local-First: Synchronously load matching project from local/cache data
   const [project, setProject] = useState(() => portfolioService.getLocalProjectById(id));
   const [loading, setLoading] = useState(() => !portfolioService.getLocalProjectById(id));
 
@@ -30,7 +14,6 @@ export function ProjectDetailView() {
     window.scrollTo(0, 0);
     let isMounted = true;
 
-    // Optional background check for dynamic changes
     portfolioService.getProjectById(id).then((data) => {
       if (isMounted) {
         if (data) setProject(data);
@@ -46,168 +29,184 @@ export function ProjectDetailView() {
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
       </div>
     );
   }
 
   if (!project) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/#projects" replace />;
   }
 
+  const hasLiveLink = Boolean(project.liveUrl && project.liveUrl.trim().length > 0);
+  const hasCodeLink = Boolean(project.githubUrl && project.githubUrl.trim().length > 0);
+  const codeLabel = project.githubLabel || (project.id === 'mospi-survey' ? 'Team repository' : 'Source Code');
+
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="space-y-12 pb-20 max-w-5xl mx-auto"
-    >
-      {/* Back Button */}
-      <motion.div variants={itemVariants}>
-        <Link to="/#projects" className="inline-flex items-center gap-2 text-sm text-text/70 hover:text-primary transition-colors group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Projects
+    <div className="max-w-4xl mx-auto space-y-10 py-8 px-4">
+      {/* Back to Projects */}
+      <div>
+        <Link
+          to="/#projects"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-text-muted hover:text-primary transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Projects</span>
         </Link>
-      </motion.div>
+      </div>
 
-      {/* Hero Banner */}
-      <motion.section variants={itemVariants} className="space-y-6 relative">
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
-        
-        {project.featured && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-xs font-bold tracking-wide uppercase self-start shadow-[0_0_15px_rgba(234,179,8,0.2)]">
-            <span>🏆</span> Featured Project
-          </div>
-        )}
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-text leading-tight">
-          {project.title}
-        </h1>
-        <p className="text-lg md:text-xl text-text/70 leading-relaxed font-light max-w-3xl">
-          {project.description}
-        </p>
-        
-        <div className="flex flex-wrap items-center gap-4 pt-6">
-          {project.githubUrl && (
-            <a 
-              href={project.githubUrl} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="group flex items-center gap-2 px-6 py-3 bg-cards/80 backdrop-blur-md border border-borders hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all shadow-lg hover:-translate-y-1"
-            >
-              <FaGithub className="w-5 h-5 group-hover:scale-110 transition-transform" /> View Repository
-            </a>
+      {/* Header Banner */}
+      <header className="space-y-4 border-b border-borders pb-8">
+        <div className="flex flex-wrap items-center gap-2">
+          {project.type && (
+            <span className="px-2.5 py-1 text-xs font-mono font-medium rounded-full bg-primary/10 text-primary border border-primary/20">
+              {project.type}
+            </span>
           )}
-          {project.liveUrl && (
-            <a 
-              href={project.liveUrl} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="group flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] hover:-translate-y-1"
-            >
-              <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform" /> Live Demo
-            </a>
+          {project.period && (
+            <span className="text-xs font-mono text-text-muted">
+              {project.period}
+            </span>
           )}
-        </div>
-      </motion.section>
-
-      {/* Grid: Problem & Tech Stack */}
-      <motion.section variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-5 gap-6 pt-10 border-t border-borders/50">
-        <div className="lg:col-span-3 space-y-4">
-          <h2 className="text-2xl font-bold tracking-tight text-text flex items-center gap-2">
-            <Blocks className="w-6 h-6 text-primary" /> The Problem
-          </h2>
-          <div className="text-text/70 leading-relaxed bg-cards/50 backdrop-blur-md p-6 rounded-2xl border border-borders h-full hover:border-primary/30 transition-colors font-light">
-            {project.problemSolved}
-          </div>
-        </div>
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-2xl font-bold tracking-tight text-text flex items-center gap-2">
-            <Code className="w-6 h-6 text-secondary" /> Tech Stack
-          </h2>
-          <ul className="flex flex-wrap gap-2 p-6 rounded-2xl border border-borders bg-cards/50 backdrop-blur-md h-full content-start hover:border-secondary/30 transition-colors">
-            {(project.technologies || []).map((tech, idx) => (
-              <motion.li 
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.05 }}
-                viewport={{ once: true }}
-                key={tech} 
-                className="px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-lg text-sm font-medium text-text/90 hover:bg-primary hover:text-white transition-colors cursor-default"
-              >
-                {tech}
-              </motion.li>
-            ))}
-          </ul>
-        </div>
-      </motion.section>
-
-      {/* System Architecture */}
-      <motion.section variants={itemVariants} className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-8">
-          <h2 className="text-3xl font-bold tracking-tight text-text flex items-center gap-3">
-            <Server className="w-8 h-8 text-primary" /> System Architecture
-          </h2>
-          {project.architectureData?.label && (
-            <span className="px-4 py-1.5 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-full uppercase tracking-wider">
-              {project.architectureData.label}
+          {project.id === 'mospi-survey' && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 text-xs font-semibold">
+              <Award className="w-3.5 h-3.5" /> Top 25 Finalist (Statathon 2025)
             </span>
           )}
         </div>
-        
-        <div className="bg-cards/30 backdrop-blur-xl p-4 md:p-8 rounded-3xl border border-borders/50 hover:border-primary/30 transition-all duration-500">
-          <ArchitectureDiagram data={project.architectureData} />
-        </div>
-        
-        {project.architectureData?.note && (
-          <p className="text-sm text-text/50 text-center italic mt-6 max-w-2xl mx-auto bg-background/50 py-2 px-4 rounded-full border border-borders/50">
-            * {project.architectureData.note}
-          </p>
-        )}
-      </motion.section>
 
-      {/* Features */}
-      <motion.section variants={itemVariants} className="space-y-6">
-        <h2 className="text-2xl font-bold tracking-tight text-text flex items-center gap-3">
-          <CheckCircle2 className="w-6 h-6 text-primary" /> Key Features
-        </h2>
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(project.features || []).map((feature, i) => (
-            <motion.li 
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05 }}
-              viewport={{ once: true }}
-              key={feature} 
-              className="group flex items-start gap-4 p-5 glass-card hover:-translate-y-1 hover:border-primary/40 transition-all duration-300"
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text">
+          {project.title}
+        </h1>
+
+        <p className="text-base sm:text-lg text-text-muted leading-relaxed font-normal">
+          {project.description}
+        </p>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3 pt-4">
+          {hasLiveLink && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-semibold transition-all shadow-sm"
             >
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary transition-colors">
-                <span className="text-primary group-hover:text-white text-sm">✓</span>
+              <span>Visit Live Platform</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
+
+          {hasCodeLink && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cards hover:bg-cards-hover border border-borders hover:border-primary/50 text-text text-sm font-medium transition-colors"
+            >
+              <FaGithub className="w-4 h-4" />
+              <span>{codeLabel}</span>
+            </a>
+          )}
+        </div>
+      </header>
+
+      {/* Visual Showcase (App Mockup & Architecture Diagram) */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold font-mono uppercase tracking-wider text-primary flex items-center gap-2">
+          <Sparkles className="w-4 h-4" />
+          Interactive System Showcase
+        </h2>
+        <ProjectVisualPreview project={project} />
+      </section>
+
+      {/* Main Content Sections */}
+      <div className="space-y-8">
+        {/* Role & Contributions */}
+        {project.myRole && (
+          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-2">
+            <h2 className="text-sm font-semibold font-mono uppercase tracking-wider text-primary flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              My Role &amp; Contributions
+            </h2>
+            <p className="text-sm sm:text-base text-text-muted leading-relaxed">
+              {project.myRole}
+            </p>
+          </div>
+        )}
+
+        {/* Problem Statement */}
+        {project.problemSolved && (
+          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-2">
+            <h2 className="text-sm font-semibold font-mono uppercase tracking-wider text-text-muted">
+              Problem Solved
+            </h2>
+            <p className="text-sm sm:text-base text-text-muted leading-relaxed">
+              {project.problemSolved}
+            </p>
+          </div>
+        )}
+
+        {/* Technologies Stack */}
+        <div className="p-6 rounded-2xl bg-cards border border-borders space-y-3">
+          <h2 className="text-sm font-semibold font-mono uppercase tracking-wider text-text-muted">
+            Technologies &amp; Architecture
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {project.technologies.map((tech) => (
+              <span
+                key={tech}
+                className="px-3 py-1 text-xs font-mono rounded-lg bg-background text-text border border-borders"
+              >
+                {tech}
               </span>
-              <span className="text-text/80 font-light leading-relaxed">{feature}</span>
-            </motion.li>
-          ))}
-        </ul>
-      </motion.section>
-
-      {/* Engineering Decisions (Challenges & Lessons) */}
-      <motion.section variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
-        <div className="space-y-4 group">
-          <h2 className="text-xl font-bold tracking-tight text-text flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-yellow-500" /> Challenges Faced
-          </h2>
-          <div className="text-text/70 leading-relaxed text-sm p-6 glass-card border-l-4 border-l-yellow-500 h-full group-hover:bg-yellow-500/5 transition-colors font-light">
-            {project.challenges}
+            ))}
           </div>
         </div>
-        <div className="space-y-4 group">
-          <h2 className="text-xl font-bold tracking-tight text-text flex items-center gap-2">
-            <Lightbulb className="w-5 h-5 text-secondary" /> What I Learned
-          </h2>
-          <div className="text-text/70 leading-relaxed text-sm p-6 glass-card border-l-4 border-l-secondary h-full group-hover:bg-secondary/5 transition-colors font-light">
-            {project.lessonsLearned}
-          </div>
-        </div>
-      </motion.section>
 
-    </motion.div>
+        {/* Delivered Features */}
+        {Array.isArray(project.features) && project.features.length > 0 && (
+          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-4">
+            <h2 className="text-sm font-semibold font-mono uppercase tracking-wider text-text-muted">
+              Key Features &amp; Modules
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {project.features.map((feature, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-text-muted">
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Engineering Challenges & Takeaways */}
+        {(project.challenges || project.lessonsLearned) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {project.challenges && (
+              <div className="p-6 rounded-2xl bg-cards border border-borders space-y-2">
+                <h3 className="text-xs font-semibold font-mono uppercase tracking-wider text-text-muted">
+                  Engineering Challenges
+                </h3>
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+                  {project.challenges}
+                </p>
+              </div>
+            )}
+            {project.lessonsLearned && (
+              <div className="p-6 rounded-2xl bg-cards border border-borders space-y-2">
+                <h3 className="text-xs font-semibold font-mono uppercase tracking-wider text-text-muted">
+                  Takeaways &amp; Growth
+                </h3>
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+                  {project.lessonsLearned}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

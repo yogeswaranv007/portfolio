@@ -1,27 +1,58 @@
 [
   {
     "year": "2023",
-    "title": "Started B.Tech IT",
-    "description": "Began formal education in Information Technology, focusing on core computer science fundamentals."
-  },
-  {
-    "year": "2023",
-    "title": "Learned Java & Built Full-Stack Projects",
-    "description": "Mastered Java and Spring Boot, building end-to-end web applications like the E-Tutor Platform."
+    "title": "B.Tech IT & Core CS Foundations",
+    "category": "Education & Core Foundations",
+    "badge": "Academic Start",
+    "icon": "GraduationCap",
+    "description": "Completed Class XII with 91.17% and enrolled in B.Tech Information Technology at Bannari Amman Institute of Technology (CGPA 8.34). Began rigorous coursework in Java, Object-Oriented Programming, and Data Structures & Algorithms.",
+    "highlights": [
+      "Class XII Tamil Nadu State Board: 91.17%",
+      "Started B.Tech IT at Bannari Amman Institute of Technology",
+      "Built initial command-line and Object-Oriented Java foundations"
+    ],
+    "technologies": ["Java", "OOP", "DSA Fundamentals", "C", "SQL"]
   },
   {
     "year": "2024",
-    "title": "400+ DSA Problems",
-    "description": "Solved 400+ LeetCode problems, maintaining a 100+ Days Coding streak to sharpen problem-solving skills."
+    "title": "Algorithms Mastery & Backend Engineering",
+    "category": "Competitive Programming & Backend",
+    "badge": "Skill Deepening",
+    "icon": "Code2",
+    "description": "Committed to deep algorithmic problem solving across LeetCode and competitive programming platforms. Transitioned into modern backend application development with Spring Boot, JPA/Hibernate, and relational database modeling.",
+    "highlights": [
+      "Scaled LeetCode problem solving across Trees, Graphs, and DP",
+      "Engineered Spring Data JPA and relational schema architectures",
+      "Adopted RESTful API principles and JWT authentication protocols"
+    ],
+    "technologies": ["Java", "Spring Boot", "Spring Data JPA", "PostgreSQL", "LeetCode", "REST APIs"]
   },
   {
     "year": "2025",
-    "title": "Statathon Top 25 National Finalist",
-    "description": "Led a team to the national grand finale among 5,000+ ideas in MoSPI Statathon 2025 with an AI Survey Tool."
+    "title": "National Hackathons & Technical Mentorship",
+    "category": "National Recognition & Leadership",
+    "badge": "Top 25 National Finalist",
+    "icon": "Trophy",
+    "description": "Led Team CODE SENTINELS to the National Grand Finale in MoSPI Statathon 2025 (Top 25 of 5,300+ teams) and reached the IEEE HackSagon National Finale (Top 600+ teams). Selected as Student Trainer at Bannari Amman Institute of Technology, teaching 50+ students.",
+    "highlights": [
+      "MoSPI Statathon 2025: National Grand Finalist (Top 25 / 5,300+ submissions)",
+      "IEEE HackSagon 2025: Selected for National Finale (600+ teams)",
+      "Student Trainer: Conducted 10+ sessions on Core Java, OOP & DSA for 50+ students"
+    ],
+    "technologies": ["FastAPI", "Spring Boot", "Bhashini API", "Twilio", "RAG & Embeddings", "PostgreSQL"]
   },
   {
-    "year": "2025",
-    "title": "HackSagon Grand Finalist",
-    "description": "Competed against 600+ teams in the IEEE HackSagon, delivering high-impact software solutions under pressure."
+    "year": "2026",
+    "title": "Production Engineering & AI Platforms",
+    "category": "Full-Stack & Systems Engineering",
+    "badge": "Production Delivery",
+    "icon": "Rocket",
+    "description": "Architected and delivered BIT Alumni Connect—a production management portal with 26 database entities and ~100 REST endpoints. Delivered an AI Learning Roadmap Generator with Groq LLM fallbacks and reached 450+ LeetCode problems solved.",
+    "highlights": [
+      "BIT Alumni Connect: ~100 REST endpoints, 26 JPA entities, deployed on Vercel, Render & Neon",
+      "AI Learning Roadmap Generator: Groq LLM integration, rule-based skill gap fallback, CI/CD",
+      "Reached 450+ LeetCode problems solved milestone"
+    ],
+    "technologies": ["Spring Boot", "Spring Security", "React", "Docker", "Groq API", "Neon PostgreSQL", "GitHub Actions"]
   }
 ]

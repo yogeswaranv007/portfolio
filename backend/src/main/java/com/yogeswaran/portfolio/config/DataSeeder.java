@@ -6,6 +6,7 @@ import com.yogeswaran.portfolio.entity.*;
 import com.yogeswaran.portfolio.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -30,44 +33,47 @@ public class DataSeeder implements CommandLineRunner {
     private final CodingProfileRepository codingProfileRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.admin.email:${ADMIN_EMAIL:admin@yogeswaran.dev}}")
+    private String adminEmail;
+
+    @Value("${app.admin.password:${ADMIN_PASSWORD:}}")
+    private String adminPassword;
+
     @Override
     public void run(String... args) throws Exception {
         seedAdminUser();
-        seedSkills(); // Always sync latest skills catalog
-        
-        // Only seed if empty
-        if (profileRepository.count() == 0) {
-            seedProfile();
-        }
-        if (projectRepository.count() == 0) {
-            seedProjects();
-        }
-        if (achievementRepository.count() == 0) {
-            seedAchievements();
-        }
-        if (codingProfileRepository.count() == 0) {
-            seedCodingProfiles();
-        }
+        syncProfile();
+        syncSkills();
+        syncProjects();
+        syncAchievements();
+        syncCodingProfiles();
     }
 
     private void seedAdminUser() {
-        var existingAdmin = adminUserRepository.findByEmail("admin@yogeswaran.dev");
+        if (adminPassword == null || adminPassword.isBlank()) {
+            if (adminUserRepository.count() == 0) {
+                log.warn("ADMIN_PASSWORD environment variable is not configured. Admin account creation deferred until set.");
+            }
+            return;
+        }
+
+        var existingAdmin = adminUserRepository.findByEmail(adminEmail);
         if (existingAdmin.isPresent()) {
             AdminUser admin = existingAdmin.get();
-            admin.setPasswordHash(passwordEncoder.encode("yogesAdmin!"));
+            admin.setPasswordHash(passwordEncoder.encode(adminPassword));
             admin.setEnabled(true);
             admin.setRole("ADMIN");
             adminUserRepository.save(admin);
-            log.info("Updated admin user password to yogesAdmin! for: admin@yogeswaran.dev");
+            log.info("Synchronized administrator credentials for email: {}", adminEmail);
         } else {
             AdminUser admin = AdminUser.builder()
-                    .email("admin@yogeswaran.dev")
-                    .passwordHash(passwordEncoder.encode("yogesAdmin!"))
+                    .email(adminEmail)
+                    .passwordHash(passwordEncoder.encode(adminPassword))
                     .role("ADMIN")
                     .enabled(true)
                     .build();
             adminUserRepository.save(admin);
-            log.info("Seeded default admin user: admin@yogeswaran.dev");
+            log.info("Initialized administrator account for email: {}", adminEmail);
         }
     }
 
@@ -88,55 +94,78 @@ public class DataSeeder implements CommandLineRunner {
         return mapper;
     }
 
-    private void seedProfile() {
+    private void syncProfile() {
         try {
             String json = readResource("data/profile.json");
             if (json != null) {
                 ObjectMapper mapper = createMapper();
-                Profile profile = mapper.readValue(json, Profile.class);
-                profile.setId("prof-1");
-                profileRepository.save(profile);
-                log.info("Seeded profile data from classpath JSON");
+                Profile incoming = mapper.readValue(json, Profile.class);
+                incoming.setId("prof-1");
+                // Ensure no phone number is ever persisted
+                incoming.setPhone("");
+                profileRepository.save(incoming);
+                log.info("Synchronized profile data from classpath JSON");
             }
         } catch (Exception e) {
-            log.error("Failed to seed profile: {}", e.getMessage());
+            log.error("Failed to synchronize profile: {}", e.getMessage());
         }
     }
 
-    private void seedProjects() {
+    private void syncProjects() {
         try {
             String json = readResource("data/projects.json");
             if (json != null) {
                 ObjectMapper mapper = createMapper();
-                List<Project> projects = mapper.readValue(json, new TypeReference<List<Project>>() {});
+                List<Project> validProjects = mapper.readValue(json, new TypeReference<List<Project>>() {});
+                Set<String> validIds = validProjects.stream().map(Project::getId).collect(Collectors.toSet());
+
+                // Purge unauthorized/legacy projects from database (e.g. e-tutor, cloud-tracker)
+                List<Project> existing = projectRepository.findAll();
+                for (Project p : existing) {
+                    if (!validIds.contains(p.getId())) {
+                        projectRepository.delete(p);
+                        log.info("Purged unauthorized/legacy project from database: {}", p.getId());
+                    }
+                }
+
+                // Upsert verified projects in specified display order
                 int order = 0;
-                for (Project p : projects) {
+                for (Project p : validProjects) {
                     p.setDisplayOrder(order++);
                     projectRepository.save(p);
                 }
-                log.info("Seeded projects data from classpath JSON");
+                log.info("Synchronized {} verified projects into database", validProjects.size());
             }
         } catch (Exception e) {
-            log.error("Failed to seed projects: {}", e.getMessage());
+            log.error("Failed to synchronize projects: {}", e.getMessage());
         }
     }
 
-    private void seedSkills() {
+    private void syncSkills() {
         try {
             String json = readResource("data/skills.json");
             if (json != null) {
                 ObjectMapper mapper = createMapper();
-                List<Skill> skills = mapper.readValue(json, new TypeReference<List<Skill>>() {});
+                List<Skill> validSkills = mapper.readValue(json, new TypeReference<List<Skill>>() {});
+                Set<String> validSkillNames = validSkills.stream().map(Skill::getName).collect(Collectors.toSet());
+
+                // Purge non-permitted skills from database (e.g. AWS, C++, OAuth, ML training)
+                List<Skill> existingSkills = skillRepository.findAll();
+                for (Skill s : existingSkills) {
+                    if (!validSkillNames.contains(s.getName())) {
+                        skillRepository.delete(s);
+                        log.info("Purged non-permitted skill from database: {}", s.getName());
+                    }
+                }
+
+                // Upsert permitted skills in order
                 int order = 0;
-                for (Skill s : skills) {
+                for (Skill s : validSkills) {
                     var existingOpt = skillRepository.findByName(s.getName());
                     if (existingOpt.isPresent()) {
                         Skill existing = existingOpt.get();
                         existing.setCategory(s.getCategory());
                         existing.setDisplayOrder(order++);
-                        if (s.getIcon() != null && !s.getIcon().isEmpty()) {
-                            existing.setIcon(s.getIcon());
-                        }
                         existing.setEnabled(s.isEnabled());
                         skillRepository.save(existing);
                     } else {
@@ -147,46 +176,48 @@ public class DataSeeder implements CommandLineRunner {
                         skillRepository.save(s);
                     }
                 }
-                log.info("Synced and seeded total {} skills into database from classpath JSON", skills.size());
+                log.info("Synchronized total {} permitted skills into database", validSkills.size());
             }
         } catch (Exception e) {
-            log.error("Failed to seed skills: {}", e.getMessage());
+            log.error("Failed to synchronize skills: {}", e.getMessage());
         }
     }
 
-    private void seedAchievements() {
+    private void syncAchievements() {
         try {
             String json = readResource("data/achievements.json");
             if (json != null) {
                 ObjectMapper mapper = createMapper();
                 List<Achievement> achievements = mapper.readValue(json, new TypeReference<List<Achievement>>() {});
+                achievementRepository.deleteAll();
                 int order = 0;
                 for (Achievement a : achievements) {
                     a.setDisplayOrder(order++);
                     achievementRepository.save(a);
                 }
-                log.info("Seeded achievements data from classpath JSON");
+                log.info("Synchronized {} verified achievements into database", achievements.size());
             }
         } catch (Exception e) {
-            log.error("Failed to seed achievements: {}", e.getMessage());
+            log.error("Failed to synchronize achievements: {}", e.getMessage());
         }
     }
 
-    private void seedCodingProfiles() {
+    private void syncCodingProfiles() {
         try {
             String json = readResource("data/codingProfiles.json");
             if (json != null) {
                 ObjectMapper mapper = createMapper();
                 List<CodingProfile> profiles = mapper.readValue(json, new TypeReference<List<CodingProfile>>() {});
+                codingProfileRepository.deleteAll();
                 int order = 0;
                 for (CodingProfile cp : profiles) {
                     cp.setDisplayOrder(order++);
                     codingProfileRepository.save(cp);
                 }
-                log.info("Seeded coding profiles data from classpath JSON");
+                log.info("Synchronized {} coding profiles into database", profiles.size());
             }
         } catch (Exception e) {
-            log.error("Failed to seed coding profiles: {}", e.getMessage());
+            log.error("Failed to synchronize coding profiles: {}", e.getMessage());
         }
     }
 }

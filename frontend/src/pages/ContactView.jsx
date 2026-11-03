@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, MapPin, Loader2, ArrowRight, Phone, AlertCircle, ExternalLink } from 'lucide-react';
+import { Mail, MapPin, Send, AlertCircle, CheckCircle2, ExternalLink, Copy, Check, Clock } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
+import { SiLeetcode, SiCodeforces, SiCodechef } from 'react-icons/si';
 import toast from 'react-hot-toast';
 import { portfolioService } from '../services/portfolioService';
 
+const RATE_LIMIT_SECONDS = 30;
+
 export default function ContactView() {
-  // Local-First: Immediate synchronous fallback hydration
   const [profileData, setProfileData] = useState(() => portfolioService.getLocalProfile());
   const [formData, setFormData] = useState({
     name: '',
@@ -16,7 +17,8 @@ export default function ContactView() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
-  const [submitFallbackNotice, setSubmitFallbackNotice] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'fallback' | null
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -26,18 +28,30 @@ export default function ContactView() {
     return () => { isMounted = false; };
   }, []);
 
+  const recipientEmail = profileData.email || 'yogeswaranv599@gmail.com';
+
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please provide a valid email';
+    const errs = {};
+    if (!formData.name.trim()) {
+      errs.name = 'Please provide your name';
+    } else if (formData.name.trim().length < 2) {
+      errs.name = 'Name must be at least 2 characters';
     }
-    if (!formData.message.trim()) newErrors.message = 'Message is required';
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    if (!formData.email.trim()) {
+      errs.email = 'Please provide your email address';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      errs.email = 'Please enter a valid email format';
+    }
+
+    if (!formData.message.trim()) {
+      errs.message = 'Please provide a message';
+    } else if (formData.message.trim().length < 10) {
+      errs.message = 'Message must be at least 10 characters';
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
   const handleChange = (e) => {
@@ -46,239 +60,313 @@ export default function ContactView() {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
     }
-    if (submitFallbackNotice) {
-      setSubmitFallbackNotice(false);
-    }
+  };
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(recipientEmail);
+    setCopied(true);
+    toast.success('Email copied to clipboard!');
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    // Rate-limiting check
+    const lastSubmitTime = localStorage.getItem('last_contact_submission');
+    const now = Date.now();
+    if (lastSubmitTime && now - parseInt(lastSubmitTime, 10) < RATE_LIMIT_SECONDS * 1000) {
+      const waitTime = Math.ceil((RATE_LIMIT_SECONDS * 1000 - (now - parseInt(lastSubmitTime, 10))) / 1000);
+      toast.error(`Please wait ${waitTime}s before sending another message.`, { icon: '⏳' });
+      return;
+    }
+
     setIsSubmitting(true);
-    setSubmitFallbackNotice(false);
+    setSubmitStatus(null);
 
     try {
       await portfolioService.sendMessage(formData);
-      toast.success('Thank you! Your message has been sent successfully.', {
-        duration: 5000,
-        position: 'bottom-center',
-      });
+      localStorage.setItem('last_contact_submission', String(Date.now()));
+      setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
+      toast.success('Message sent successfully! I will reply shortly.');
     } catch {
-      // Backend unavailable / sleeping fallback
-      setSubmitFallbackNotice(true);
-      toast.error('Server unavailable. Please reach out directly via Email or LinkedIn below.', {
-        duration: 6000,
-      });
+      // Backend unavailable / sleeping / error -> trigger explicit fallback
+      setSubmitStatus('fallback');
+      toast.error('Direct server transmission unavailable. Please use the direct email link below.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const mailtoUrl = `mailto:${profileData.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(`Hi ${profileData.name},\n\n${formData.message}\n\nFrom: ${formData.name} (${formData.email})`)}`;
+  const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(
+    formData.subject || 'Portfolio Inquiry'
+  )}&body=${encodeURIComponent(
+    `Hello Yogeswaran,\n\n${formData.message}\n\nFrom: ${formData.name} (${formData.email})`
+  )}`;
 
   return (
-    <div className="space-y-12 pb-4 max-w-5xl mx-auto">
-      <div className="space-y-4 text-center md:text-left relative">
-        <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
-        <motion.h1 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-4xl md:text-5xl font-extrabold tracking-tight text-text flex flex-col md:flex-row items-center gap-4"
-        >
-          <div className="p-4 bg-primary/10 rounded-2xl">
-            <Mail className="w-10 h-10 text-primary" />
-          </div>
-          Let's build something.
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-lg text-text/70 max-w-2xl leading-relaxed mx-auto md:mx-0 font-light"
-        >
-          I'm currently open to new software engineering opportunities. Whether you have a question or want to discuss a project, feel free to reach out!
-        </motion.p>
+    <section className="space-y-10" id="contact">
+      {/* Section Header */}
+      <div className="flex items-center gap-3">
+        <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
+          <Mail className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text">
+            Get In Touch
+          </h2>
+          <p className="text-xs sm:text-sm text-text-muted">
+            Open to fresher &amp; intern roles at product and startup companies, and freelance opportunities.
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 pt-8">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="lg:col-span-2 space-y-6"
-        >
-          <a href={`mailto:${profileData.email}`} className="group flex items-center gap-6 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_10px_20px_rgba(37,99,235,0.1)] transition-all duration-300 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="p-4 bg-background border border-borders/50 rounded-xl group-hover:bg-primary/10 group-hover:border-primary/50 transition-colors relative z-10">
-              <Mail className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Contact Info Column */}
+        <div className="lg:col-span-5 space-y-5">
+          {/* Email Card */}
+          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider">
+                Direct Email
+              </span>
+              <button
+                onClick={handleCopyEmail}
+                type="button"
+                className="p-1.5 rounded-lg border border-borders hover:border-primary/50 text-text-muted hover:text-text text-xs flex items-center gap-1 transition-colors"
+                title="Copy email to clipboard"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
             </div>
-            <div className="relative z-10 flex-1">
-              <p className="text-sm font-bold text-text/50 uppercase tracking-widest mb-1">Email</p>
-              <p className="text-text font-medium group-hover:text-primary transition-colors">{profileData.email}</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-text/30 group-hover:text-primary group-hover:translate-x-1 opacity-0 group-hover:opacity-100 transition-all relative z-10" />
-          </a>
-          
-          <a href={`tel:${profileData.phone}`} className="group flex items-center gap-6 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-green-500/50 hover:shadow-[0_10px_20px_rgba(34,197,94,0.1)] transition-all duration-300 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="p-4 bg-background border border-borders/50 rounded-xl group-hover:bg-green-500/10 group-hover:border-green-500/50 transition-colors relative z-10">
-              <Phone className="w-6 h-6 text-green-500 group-hover:scale-110 transition-transform" />
-            </div>
-            <div className="relative z-10 flex-1">
-              <p className="text-sm font-bold text-text/50 uppercase tracking-widest mb-1">Phone</p>
-              <p className="text-text font-medium group-hover:text-green-500 transition-colors">{profileData.phone || 'Available on request'}</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-text/30 group-hover:text-green-500 group-hover:translate-x-1 opacity-0 group-hover:opacity-100 transition-all relative z-10" />
-          </a>
-          
-          <div className="group flex items-center gap-6 p-6 glass-card rounded-2xl border-borders/50 relative overflow-hidden">
-            <div className="p-4 bg-background border border-borders/50 rounded-xl relative z-10">
-              <MapPin className="w-6 h-6 text-secondary" />
-            </div>
-            <div className="relative z-10">
-              <p className="text-sm font-bold text-text/50 uppercase tracking-widest mb-1">Location</p>
-              <p className="text-text font-medium">{profileData.location}</p>
-            </div>
+
+            <a
+              href={`mailto:${recipientEmail}`}
+              className="text-base sm:text-lg font-bold text-text hover:text-primary transition-colors block break-all font-mono"
+            >
+              {recipientEmail}
+            </a>
+
+            <p className="text-xs text-text-muted leading-relaxed">
+              Feel free to reach out regarding engineering roles, technical collaboration, or inquiries.
+            </p>
           </div>
 
-          <div className="flex gap-4">
-            <a 
-              href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-text/50 hover:bg-text/5 transition-all duration-300"
-            >
-              <FaGithub className="w-8 h-8 text-text/70 group-hover:text-text group-hover:scale-110 transition-all" />
-              <span className="text-sm font-medium text-text/70 group-hover:text-text transition-colors">GitHub</span>
-            </a>
-            <a 
-              href={profileData.linkedin || 'https://www.linkedin.com'} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex-1 group flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
-            >
-              <FaLinkedin className="w-8 h-8 text-text/70 group-hover:text-primary group-hover:scale-110 transition-all" />
-              <span className="text-sm font-medium text-text/70 group-hover:text-primary transition-colors">LinkedIn</span>
-            </a>
+          {/* Location & Status Card */}
+          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-3 shadow-sm">
+            <div className="flex items-center gap-2 text-text font-semibold text-sm">
+              <MapPin className="w-4 h-4 text-primary" />
+              <span>Location: {profileData.location || 'Tamil Nadu, India'}</span>
+            </div>
+            <p className="text-xs text-text-muted leading-relaxed">
+              Open to: fresher and intern roles in software development and AI at product and startup companies. Also available for freelance work.
+            </p>
           </div>
-        </motion.div>
 
-        <motion.form 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          className="lg:col-span-3 glass-card p-6 md:p-8 space-y-6 rounded-3xl relative"
-          onSubmit={handleSubmit}
-        >
-          {submitFallbackNotice && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-5 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-text space-y-3"
-            >
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-text/90 leading-relaxed font-normal">
-                  Unable to send your message through the server right now. Please contact me directly via email or LinkedIn.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3 pt-1">
-                <a 
-                  href={mailtoUrl}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-semibold rounded-xl hover:bg-primary/90 transition-all shadow-md"
-                >
-                  <Mail className="w-3.5 h-3.5" /> Send Direct Email <ExternalLink className="w-3 h-3" />
-                </a>
-                <a 
-                  href={profileData.linkedin || 'https://www.linkedin.com'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-cards border border-borders text-text hover:text-primary hover:border-primary/50 text-xs font-semibold rounded-xl transition-all"
-                >
-                  <FaLinkedin className="w-3.5 h-3.5 text-[#0A66C2]" /> Open LinkedIn <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            </motion.div>
-          )}
+          {/* Professional Profiles */}
+          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-3 shadow-sm">
+            <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider block">
+              Professional Profiles
+            </span>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <a
+                href="https://github.com/yogeswaranv007"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
+              >
+                <FaGithub className="w-4 h-4" />
+                <span>GitHub</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/yogeswaranv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
+              >
+                <FaLinkedin className="w-4 h-4 text-[#0A66C2]" />
+                <span>LinkedIn</span>
+              </a>
+              <a
+                href="https://leetcode.com/u/Yogeswaran_v/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
+              >
+                <SiLeetcode className="w-4 h-4 text-[#FFA116]" />
+                <span>LeetCode</span>
+              </a>
+              <a
+                href="https://codeforces.com/profile/yogeswaranv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
+              >
+                <SiCodeforces className="w-4 h-4 text-[#1F8ACB]" />
+                <span>Codeforces</span>
+              </a>
+            </div>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-text/90 ml-1">Name <span className="text-primary">*</span></label>
-              <input 
-                type="text" 
+        {/* Contact Form Column */}
+        <div className="lg:col-span-7">
+          <form
+            onSubmit={handleSubmit}
+            className="p-6 sm:p-8 rounded-2xl bg-cards border border-borders shadow-sm space-y-5"
+          >
+            <h3 className="text-lg font-bold text-text">
+              Send a Direct Message
+            </h3>
+
+            {/* Success Banner */}
+            {submitStatus === 'success' && (
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold">Message delivered successfully!</p>
+                  <p className="text-xs text-text-muted mt-0.5">Thank you for getting in touch. I will respond to your email as soon as possible.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Fallback Banner (when backend is unreachable) */}
+            {submitStatus === 'fallback' && (
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs sm:text-sm space-y-2">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold">Server response timed out</p>
+                    <p className="text-xs text-text-muted mt-0.5">
+                      The automated email service is currently unavailable. Please click below to send via your local email client instead.
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-1">
+                  <a
+                    href={mailtoUrl}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Open in Email Client</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Name Input */}
+            <div className="space-y-1">
+              <label htmlFor="contact-name" className="block text-xs font-mono font-medium text-text">
+                Your Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="contact-name"
                 name="name"
+                type="text"
+                autoComplete="name"
                 value={formData.name}
                 onChange={handleChange}
-                disabled={isSubmitting}
-                className={`w-full p-4 rounded-xl bg-background border ${errors.name ? 'border-red-500/50 focus:border-red-500' : 'border-borders focus:border-primary'} text-text focus:outline-none transition-all focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]`} 
-                placeholder="John Doe" 
+                placeholder="e.g. Alex Smith"
+                className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors ${
+                  errors.name ? 'border-red-500' : 'border-borders'
+                }`}
               />
-              {errors.name && <p className="text-xs text-red-500 mt-1 ml-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-xs text-red-500 font-mono mt-1">{errors.name}</p>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-text/90 ml-1">Email <span className="text-primary">*</span></label>
-              <input 
-                type="email" 
+            {/* Email Input */}
+            <div className="space-y-1">
+              <label htmlFor="contact-email" className="block text-xs font-mono font-medium text-text">
+                Your Email Address <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="contact-email"
                 name="email"
+                type="email"
+                autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
-                disabled={isSubmitting}
-                className={`w-full p-4 rounded-xl bg-background border ${errors.email ? 'border-red-500/50 focus:border-red-500' : 'border-borders focus:border-primary'} text-text focus:outline-none transition-all focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]`} 
-                placeholder="john@example.com" 
+                placeholder="e.g. alex@company.com"
+                className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors ${
+                  errors.email ? 'border-red-500' : 'border-borders'
+                }`}
               />
-              {errors.email && <p className="text-xs text-red-500 mt-1 ml-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-xs text-red-500 font-mono mt-1">{errors.email}</p>
+              )}
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-text/90 ml-1">Subject</label>
-            <input 
-              type="text" 
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              className={`w-full p-4 rounded-xl bg-background border ${errors.subject ? 'border-red-500/50 focus:border-red-500' : 'border-borders focus:border-primary'} text-text focus:outline-none transition-all focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]`} 
-              placeholder="Engineering Opportunity" 
-            />
-            {errors.subject && <p className="text-xs text-red-500 mt-1 ml-1">{errors.subject}</p>}
-          </div>
+            {/* Subject Input */}
+            <div className="space-y-1">
+              <label htmlFor="contact-subject" className="block text-xs font-mono font-medium text-text">
+                Subject
+              </label>
+              <input
+                id="contact-subject"
+                name="subject"
+                type="text"
+                value={formData.subject}
+                onChange={handleChange}
+                placeholder="e.g. Opportunity / Software Engineering Role"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-borders text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-text/90 ml-1">Message <span className="text-primary">*</span></label>
-            <textarea 
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              rows="5" 
-              className={`w-full p-4 rounded-xl bg-background border ${errors.message ? 'border-red-500/50 focus:border-red-500' : 'border-borders focus:border-primary'} text-text focus:outline-none transition-all resize-none focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]`} 
-              placeholder="Hello Yogeswaran..."
-            />
-            {errors.message && <p className="text-xs text-red-500 mt-1 ml-1">{errors.message}</p>}
-          </div>
+            {/* Message Input */}
+            <div className="space-y-1">
+              <label htmlFor="contact-message" className="block text-xs font-mono font-medium text-text">
+                Message <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="contact-message"
+                name="message"
+                rows={4}
+                value={formData.message}
+                onChange={handleChange}
+                placeholder="Tell me about the role, project, or question..."
+                className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors resize-none ${
+                  errors.message ? 'border-red-500' : 'border-borders'
+                }`}
+              />
+              {errors.message && (
+                <p className="text-xs text-red-500 font-mono mt-1">{errors.message}</p>
+              )}
+            </div>
 
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="group w-full py-4 bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] flex justify-center items-center gap-2 mt-4 hover:-translate-y-0.5"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              <>
-                Send Message <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
-        </motion.form>
+            {/* Submit Button */}
+            <div className="pt-2 flex items-center justify-between">
+              <span className="text-xs text-text-muted flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                Rate limited (30s)
+              </span>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-sm font-semibold transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Send Message</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

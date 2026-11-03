@@ -27,6 +27,10 @@ public class Achievement {
     @Column(nullable = false)
     private String title;
 
+    private String category;
+    private String badge;
+    private String icon;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

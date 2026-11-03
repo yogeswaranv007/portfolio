@@ -1,155 +1,145 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Download, ArrowRight, Code2, FileText } from 'lucide-react';
-import { FaGithub, FaLinkedin, FaJava, FaReact, FaAws, FaNodeJs } from 'react-icons/fa';
+import { ArrowRight, Mail, FileDown, ExternalLink } from 'lucide-react';
+import { FaGithub, FaLinkedin, FaJava, FaReact } from 'react-icons/fa';
+import { SiSpringboot, SiPostgresql } from 'react-icons/si';
 import { portfolioService } from '../../services/portfolioService';
-import { Typewriter } from '../ui/Typewriter';
-import { resumeService } from '../../services/resumeService';
+import resumeMeta from '../../data/resume.json';
 
-const FloatingBadge = ({ icon: Icon, delay, className }) => (
+const FloatingBadge = ({ icon: Icon, delay, className, label }) => (
   <motion.div
-    animate={{ y: [0, -12, 0] }}
-    transition={{ repeat: Infinity, duration: 5, delay, ease: "easeInOut" }}
-    className={`absolute z-20 flex items-center justify-center w-12 h-12 rounded-xl glass-card border border-borders/50 shadow-xl ${className}`}
+    animate={{ y: [0, -8, 0] }}
+    transition={{ repeat: Infinity, duration: 4, delay, ease: 'easeInOut' }}
+    className={`absolute z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cards border border-borders shadow-md text-xs font-mono font-medium ${className}`}
+    title={label}
   >
-    <Icon className="w-6 h-6" />
+    <Icon className="w-4 h-4" />
+    <span className="hidden sm:inline">{label}</span>
   </motion.div>
 );
 
 export function Hero() {
-  // Local-First: Immediate synchronous fallback hydration
   const [profileData, setProfileData] = useState(() => portfolioService.getLocalProfile());
 
   useEffect(() => {
-    // Optional asynchronous background enhancement (only updates if fresh data is received)
     let isMounted = true;
     portfolioService.getProfile().then((data) => {
-      if (isMounted && data) {
-        setProfileData(data);
-      }
-    }).catch(() => {});
+      if (isMounted && data) setProfileData(data);
+    }).catch(() => { });
     return () => { isMounted = false; };
   }, []);
 
-  const resumeMeta = resumeService.getResumeMetadata();
+  const headline = profileData.headline || "Final-year B.Tech IT student | Java, Spring Boot, React | AI/GenAI integrations";
+  const resumePath = resumeMeta.path || "/resume/PLACEHOLDER_RESUME_FILENAME.pdf";
 
   return (
-    <section className="flex flex-col md:flex-row items-center gap-10 py-16 relative" id="home">
-      <div className="flex-1 space-y-8 z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold tracking-wide"
-        >
-          <Code2 className="w-4 h-4" />
-          <span>Final-year B.Tech IT Student</span>
-        </motion.div>
-        
-        <motion.h1 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1]"
-        >
-          Hello, I'm <br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-text to-text/60">
+    <section className="flex flex-col lg:flex-row items-center gap-12 py-12 md:py-20 relative" id="home">
+      <div className="flex-1 space-y-6 z-10 text-center lg:text-left">
+        {/* Status / Role pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-wide">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span>Available for Fresher &amp; Intern Opportunities</span>
+        </div>
+
+        {/* Primary Name */}
+        <div className="space-y-2">
+          <p className="text-sm font-mono text-primary font-semibold tracking-wider uppercase">
+            Hi, my name is
+          </p>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-text">
             {profileData.name}
-          </span>
-          <br />
-          <span className="text-2xl md:text-3xl lg:text-4xl text-primary mt-2 block h-10">
-            <Typewriter words={profileData.roles || ['Software Engineer', 'Full Stack Developer', 'Java Specialist']} />
-          </span>
-        </motion.h1>
+          </h1>
+        </div>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-lg md:text-xl text-text/60 leading-relaxed max-w-2xl font-light"
-        >
-          {profileData.about}
-        </motion.p>
+        {/* Headline */}
+        <p className="text-lg sm:text-xl font-medium text-text-muted max-w-2xl leading-relaxed">
+          {headline}
+        </p>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-wrap items-center gap-4 pt-4"
-        >
-          <a href="#projects" className="group flex items-center gap-2 px-6 py-3.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]">
-            View Projects <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        {/* Brief summary */}
+        <p className="text-sm sm:text-base text-text-muted leading-relaxed max-w-2xl font-normal">
+          {profileData.summary || profileData.about}
+        </p>
+
+        {/* 2 Primary CTAs + Resume + Socials */}
+        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+          {/* CTA 1: View Projects */}
+          <a
+            href="#projects"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-xl transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          >
+            <span>View Projects</span>
+            <ArrowRight className="w-4 h-4" />
           </a>
-          <div className="flex items-center gap-2">
-            <a 
-              href={resumeMeta.path}
+
+          {/* CTA 2: Contact */}
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-cards hover:bg-cards-hover border border-borders text-text text-sm font-semibold rounded-xl transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          >
+            <Mail className="w-4 h-4 text-primary" />
+            <span>Contact Me</span>
+          </a>
+
+          {/* Resume Download with clearly marked placeholder */}
+          <a
+            href={resumePath}
+            download={resumeMeta.name || "Yogeswaran_V_Resume.pdf"}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-cards hover:bg-cards-hover border border-borders text-text-muted hover:text-text text-sm font-medium rounded-xl transition-all"
+            title="Download Resume PDF (Placeholder file path configured)"
+          >
+            <FileDown className="w-4 h-4 text-primary" />
+            <span>Resume</span>
+          </a>
+
+          {/* Social Links */}
+          <div className="flex items-center gap-2 pl-2">
+            <a
+              href="https://github.com/yogeswaranv007"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-6 py-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:bg-borders/50 text-text font-medium rounded-xl transition-all hover:border-primary/50"
+              className="p-2.5 rounded-xl border border-borders bg-cards hover:border-primary/50 text-text-muted hover:text-text transition-all"
+              aria-label="GitHub Profile"
             >
-              <FileText className="w-4 h-4" /> Resume
+              <FaGithub className="w-4 h-4" />
             </a>
-            <a 
-              href={resumeMeta.path}
-              download={resumeMeta.name}
-              className="flex items-center justify-center px-4 py-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:bg-borders/50 text-text font-medium rounded-xl transition-all hover:border-primary/50"
-              title="Download PDF Resume"
-              aria-label="Download PDF Resume"
+            <a
+              href="https://www.linkedin.com/in/yogeswaranv"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-xl border border-borders bg-cards hover:border-primary/50 text-text-muted hover:text-primary transition-all"
+              aria-label="LinkedIn Profile"
             >
-              <Download className="w-4 h-4" />
+              <FaLinkedin className="w-4 h-4" />
             </a>
           </div>
-          <a 
-            href={`https://github.com/${profileData.github || 'yogeswaranv007'}`} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1"
-            aria-label="GitHub Profile"
-          >
-            <FaGithub className="w-5 h-5" />
-          </a>
-          <a 
-            href={profileData.linkedin || 'https://www.linkedin.com'} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="flex items-center justify-center p-3.5 bg-cards/50 backdrop-blur-md border border-borders/50 hover:border-primary/50 text-text hover:text-primary font-medium rounded-xl transition-all hover:-translate-y-1"
-            aria-label="LinkedIn Profile"
-          >
-            <FaLinkedin className="w-5 h-5" />
-          </a>
-        </motion.div>
+        </div>
       </div>
 
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="w-full md:w-5/12 max-w-[400px] aspect-square relative hidden md:block"
-      >
-        {/* Decorative background glow */}
-        <div className="absolute inset-4 bg-gradient-to-tr from-primary/30 to-secondary/10 rounded-full blur-3xl -z-10" />
-        
-        {/* Floating Tech Badges */}
-        <FloatingBadge icon={FaJava} delay={0} className="text-[#ED8B00] top-10 left-4" />
-        <FloatingBadge icon={FaReact} delay={1} className="text-[#61DAFB] top-20 right-4" />
-        <FloatingBadge icon={FaNodeJs} delay={2.5} className="text-[#339933] bottom-32 -left-4" />
-        <FloatingBadge icon={FaAws} delay={1.5} className="text-[#FF9900] bottom-16 right-10" />
+      {/* Avatar Container with Floating Badges (Java, Spring Boot, React, PostgreSQL) */}
+      <div className="w-full lg:w-1/2 max-w-[420px] sm:max-w-[460px] lg:max-w-[490px] aspect-square relative mx-auto flex items-center justify-center">
+        {/* Subtle Ambient Backlight Glow */}
+        <div className="absolute inset-2 bg-gradient-to-tr from-primary/20 via-amber-500/10 to-primary/20 rounded-full blur-3xl -z-10 opacity-70" />
 
-        {/* Optimized Main Image Container */}
-        <div className="absolute inset-8 rounded-full border border-borders/50 p-2 bg-background/50 backdrop-blur-sm z-10 overflow-visible">
-           <div className="w-full h-full rounded-full overflow-hidden border border-borders/50 relative group">
-             <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none" />
-             <img 
-               src={profileData.imageBase64 || "/yoges_profile.jpeg"} 
-               alt={profileData.name || "Yogeswaran V"} 
-               width="350"
-               height="350"
-               loading="eager"
-               decoding="async"
-               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-             />
-           </div>
+        {/* Tech Badges */}
+        <FloatingBadge icon={FaJava} delay={0} label="Java" className="text-[#ED8B00] top-6 -left-2 sm:-left-4" />
+        <FloatingBadge icon={SiSpringboot} delay={1.2} label="Spring Boot" className="text-[#6DB33F] top-14 -right-3 sm:-right-4" />
+        <FloatingBadge icon={FaReact} delay={2.4} label="React" className="text-[#61DAFB] bottom-20 -left-3 sm:-left-5" />
+        <FloatingBadge icon={SiPostgresql} delay={1.8} label="PostgreSQL" className="text-[#4169E1] bottom-8 -right-2 sm:-right-3" />
+
+        {/* Profile Image (Borderless, Large, Cinematic Shadow) */}
+        <div className="w-full h-full rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden group">
+          <img
+            src={profileData.imageBase64 || "/yoges_profile.jpeg"}
+            alt="Yogeswaran V"
+            width="500"
+            height="500"
+            loading="eager"
+            decoding="async"
+            className="w-full h-full object-cover rounded-3xl grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 select-none"
+          />
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

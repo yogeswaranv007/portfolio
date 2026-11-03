@@ -1,0 +1,53 @@
+{
+  "experience": [
+    {
+      "id": "exp-1",
+      "role": "Student Trainer",
+      "organization": "Bannari Amman Institute of Technology",
+      "period": "Sep - Oct 2025",
+      "type": "Academic Mentorship",
+      "description": "Taught Core Java, Object-Oriented Programming (OOP), Java Collections Framework, and DSA problem solving to 50+ junior students across 10+ hands-on technical sessions."
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-1",
+      "degree": "B.Tech in Information Technology",
+      "institution": "Bannari Amman Institute of Technology",
+      "period": "2023 - 2027 (Expected)",
+      "score": "CGPA: 8.34",
+      "coursework": [
+        "Data Structures & Algorithms (DSA)",
+        "Object-Oriented Programming (OOP)",
+        "Database Management Systems (DBMS)",
+        "Java Collections Framework"
+      ]
+    },
+    {
+      "id": "edu-2",
+      "degree": "Class XII (Higher Secondary)",
+      "institution": "Tamil Nadu State Board",
+      "period": "2021 - 2023",
+      "score": "91.17%",
+      "coursework": [
+        "Mathematics",
+        "Physics",
+        "Chemistry",
+        "Computer Science"
+      ]
+    },
+    {
+      "id": "edu-3",
+      "degree": "Class X (Secondary School)",
+      "institution": "ICSE",
+      "period": "2020 - 2021",
+      "score": "96.17%",
+      "coursework": [
+        "Science",
+        "Mathematics",
+        "Computer Applications"
+      ]
+    }
+  ]
+}
+

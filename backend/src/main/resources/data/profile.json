@@ -1,11 +1,23 @@
 {
   "name": "Yogeswaran V",
-  "title": "Software Engineer",
-  "roles": ["Java Backend Developer", "Full Stack Developer", "Problem Solver"],
-  "about": "Final-year Information Technology student passionate about building scalable backend systems, modern web applications, and AI-powered solutions. I enjoy transforming complex ideas into production-ready software.",
+  "title": "Final-year B.Tech IT student | Java, Spring Boot, React | AI/GenAI integrations",
+  "roles": [
+    "Final-year B.Tech IT student",
+    "Java & Spring Boot Developer",
+    "React & Full-Stack Engineer",
+    "AI/GenAI Integrations"
+  ],
+  "about": "Final-year B.Tech Information Technology student (CGPA 8.34) focused on backend and full-stack product engineering. Builds secure, API-driven applications in Java and Spring Boot, and adds AI features such as RAG-based generation where a product needs them. Looking for a product or startup engineering role where I can ship features end to end.",
   "email": "yogeswaranv599@gmail.com",
-  "phone": "+91 6383031849",
-  "location": "India",
-  "resumeUrl": "/resume.pdf",
-  "currentFocus": ["Spring Boot Microservices", "Docker & Redis", "System Design Architecture", "AWS Cloud Practitioner"]
+  "phone": "",
+  "location": "Tamil Nadu, India",
+  "resumeUrl": "/resume/YOUR_RESUME_FILENAME.pdf",
+  "github": "https://github.com/yogeswaranv007",
+  "linkedin": "https://www.linkedin.com/in/yogeswaranv",
+  "currentFocus": [
+    "Java & Spring Boot Backend Systems",
+    "React & Modern UI Engineering",
+    "RAG & LLM Integration",
+    "API Security & Relational Databases"
+  ]
 }

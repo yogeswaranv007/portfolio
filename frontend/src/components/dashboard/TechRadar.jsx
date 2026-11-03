@@ -1,34 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { portfolioService } from '../../services/portfolioService';
 import { Layers } from 'lucide-react';
+import { portfolioService } from '../../services/portfolioService';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 10 },
-  show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
-};
+const PREFERRED_GROUP_ORDER = [
+  'Languages',
+  'Backend',
+  'Databases',
+  'Frontend',
+  'AI',
+  'Tools',
+  'Core CS'
+];
 
 const groupSkills = (data) => {
   if (!Array.isArray(data)) return {};
-  return data.reduce((acc, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = [];
+  const map = {};
+  data.forEach((skill) => {
     if (skill.enabled !== false) {
-      acc[skill.category].push(skill.name);
+      const category = skill.category || 'General';
+      if (!map[category]) map[category] = [];
+      map[category].push(skill.name);
     }
-    return acc;
-  }, {});
+  });
+  return map;
 };
 
 export function TechRadar() {
-  // Local-First: Immediate synchronous fallback hydration
   const [skillsData, setSkillsData] = useState(() => groupSkills(portfolioService.getLocalSkills()));
 
   useEffect(() => {
@@ -41,46 +38,66 @@ export function TechRadar() {
     return () => { isMounted = false; };
   }, []);
 
+  // Sort groups by preferred order
+  const orderedCategories = Object.keys(skillsData).sort((a, b) => {
+    const idxA = PREFERRED_GROUP_ORDER.indexOf(a);
+    const idxB = PREFERRED_GROUP_ORDER.indexOf(b);
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
   return (
     <section className="space-y-8" id="skills">
-      <div className="flex items-center gap-3 text-text">
-        <Layers className="w-8 h-8 text-primary" />
-        <h2 className="text-3xl font-bold tracking-tight">Technology Ecosystem</h2>
+      {/* Section Header */}
+      <div className="flex items-center gap-3">
+        <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
+          <Layers className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text">
+            Technical Skills
+          </h2>
+          <p className="text-xs sm:text-sm text-text-muted">
+            Grouped technologies and core competencies
+          </p>
+        </div>
       </div>
-      
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: "-100px" }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
-        {Object.entries(skillsData).map(([category, skills]) => (
-          <motion.div 
-            key={category}
-            variants={itemVariants}
-            className="group glass-card p-6 flex flex-col gap-5 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(37,99,235,0.1)] hover:border-primary/30"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
-            <h3 className="relative z-10 text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary/50 group-hover:bg-primary transition-colors animate-pulse" />
-              {category}
-            </h3>
-            
-            <div className="relative z-10 flex flex-wrap gap-2.5">
-              {skills.map(skill => (
-                <span 
-                  key={skill}
-                  className="px-3 py-1.5 bg-background border border-borders/50 rounded-lg text-sm font-medium text-text/80 hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all duration-300 cursor-default hover:scale-105"
-                >
-                  {skill}
-                </span>
-              ))}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {orderedCategories.map((category) => {
+          const skills = skillsData[category] || [];
+          return (
+            <div
+              key={category}
+              className="p-5 rounded-2xl bg-cards border border-borders hover:border-primary/40 transition-all duration-200 shadow-sm flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3.5">
+                  <h3 className="text-sm font-semibold text-text uppercase tracking-wider font-mono">
+                    {category}
+                  </h3>
+                  <span className="text-xs font-mono text-text-muted bg-background px-2 py-0.5 rounded border border-borders">
+                    {skills.length}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-2.5 py-1 text-xs font-mono font-medium rounded-lg bg-background text-text border border-borders hover:border-primary/50 hover:text-primary transition-colors cursor-default"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
-          </motion.div>
-        ))}
-      </motion.div>
+          );
+        })}
+      </div>
     </section>
   );
 }

@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, User, Code2, FolderGit2, Link as LinkIcon, Mail } from 'lucide-react';
+import { Menu, X, Home, User, Code2, FolderGit2, GraduationCap, Trophy, Mail } from 'lucide-react';
+import { ThemeToggle } from '../common/ThemeToggle';
 
 const navLinks = [
   { path: '#home', label: 'Home', icon: Home },
   { path: '#about', label: 'About', icon: User },
   { path: '#skills', label: 'Skills', icon: Code2 },
   { path: '#projects', label: 'Projects', icon: FolderGit2 },
-  { path: '#achievements', label: 'Achievements', icon: LinkIcon },
+  { path: '#experience-education', label: 'Experience & Education', icon: GraduationCap },
+  { path: '#achievements', label: 'Achievements', icon: Trophy },
   { path: '#contact', label: 'Contact', icon: Mail },
 ];
 
@@ -19,14 +21,14 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle scroll detection for glass header background
+  // Scroll detection for glass header background
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle ESC to close
+  // Handle ESC key
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') setIsOpen(false);
@@ -57,10 +59,10 @@ export function Navbar() {
           }
         });
       },
-      { rootMargin: '-20% 0px -80% 0px' }
+      { rootMargin: '-20% 0px -70% 0px' }
     );
 
-    const sections = document.querySelectorAll('div[id], section[id]');
+    const sections = document.querySelectorAll('section[id], div[id]');
     sections.forEach((section) => observer.observe(section));
 
     return () => sections.forEach((section) => observer.unobserve(section));
@@ -69,8 +71,7 @@ export function Navbar() {
   const handleNavClick = (e, path) => {
     e.preventDefault();
     setIsOpen(false);
-    
-    // If we're not on the home page and trying to go to a section, navigate to home first
+
     if (location.pathname !== '/' && path.startsWith('#')) {
       navigate('/' + path);
       return;
@@ -80,7 +81,6 @@ export function Navbar() {
       const element = document.querySelector(path);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
-        // Optional: Update URL hash without jumping
         window.history.pushState(null, '', path);
       }
     } else {
@@ -88,82 +88,105 @@ export function Navbar() {
     }
   };
 
-  // If there's a hash on load/navigate, scroll to it
-  useEffect(() => {
-    if (location.pathname === '/' && location.hash) {
-      setTimeout(() => {
-        const element = document.querySelector(location.hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
-  }, [location.pathname, location.hash]);
-
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'py-2 md:py-4' : 'py-4 md:py-6'}`}>
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="glass-card rounded-2xl flex items-center justify-between px-6 py-3 bg-cards/80 shadow-xl border-borders/50 backdrop-blur-xl">
-            <button 
-              onClick={(e) => handleNavClick(e, '#home')} 
-              className="text-xl font-bold tracking-tight text-text hover:text-primary transition-colors flex items-center gap-2"
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          scrolled ? 'py-3 bg-background/80 backdrop-blur-md border-b border-borders' : 'py-5 bg-transparent'
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <a
+              href="#home"
+              onClick={(e) => handleNavClick(e, '#home')}
+              className="text-lg font-bold tracking-tight text-text hover:text-primary transition-colors flex items-center gap-2 group"
             >
-              <span className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
+              <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20 font-mono font-semibold group-hover:bg-primary group-hover:text-white transition-all">
                 Y
               </span>
-              Yogeswaran<span className="text-primary">.dev</span>
-            </button>
+              <span>
+                Yogeswaran<span className="text-primary font-mono">.dev</span>
+              </span>
+            </a>
 
-            <button 
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 -mr-2 text-text/70 hover:text-primary bg-background/50 rounded-xl transition-colors border border-borders/50 hover:border-primary/50 flex items-center justify-center"
-              aria-label="Toggle Menu"
-            >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-1 bg-cards/80 border border-borders px-3 py-1.5 rounded-full shadow-sm backdrop-blur-md">
+              {navLinks.map((link) => {
+                const id = link.path.replace('#', '');
+                const isActive = location.pathname === '/' && activeSection === id;
+
+                return (
+                  <a
+                    key={link.path}
+                    href={link.path}
+                    onClick={(e) => handleNavClick(e, link.path)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ${
+                      isActive
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'text-text-muted hover:text-text hover:bg-background/60'
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
+            </nav>
+
+            {/* Controls (Theme Toggle & Mobile Menu Trigger) */}
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="lg:hidden p-2 rounded-xl border border-borders bg-cards hover:border-primary/50 text-text transition-colors flex items-center justify-center"
+                aria-label="Toggle Navigation Menu"
+              >
+                {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Floating Menu Overlay (Desktop + Mobile) */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-background/70 backdrop-blur-sm z-40 lg:hidden"
             />
-            
-            {/* Menu Panel */}
+
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-              className="fixed top-24 right-4 md:right-8 w-[calc(100%-2rem)] md:w-80 glass-card bg-cards shadow-2xl rounded-2xl z-50 overflow-hidden border-borders/50"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-20 right-4 left-4 glass-card bg-cards shadow-2xl rounded-2xl z-50 p-4 border border-borders lg:hidden"
             >
-              <nav className="flex flex-col p-2">
+              <nav className="flex flex-col gap-1">
                 {navLinks.map((link) => {
                   const id = link.path.replace('#', '');
                   const isActive = location.pathname === '/' && activeSection === id;
-                  
+
                   return (
                     <a
                       key={link.path}
                       href={link.path}
                       onClick={(e) => handleNavClick(e, link.path)}
-                      className={`
-                        flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group
-                        ${isActive ? 'bg-primary/10 text-primary' : 'text-text/70 hover:bg-background/80 hover:text-text'}
-                      `}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-primary text-white'
+                          : 'text-text-muted hover:bg-background hover:text-text'
+                      }`}
                     >
-                      <link.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-primary' : 'group-hover:text-primary'}`} />
-                      <span className="font-medium">{link.label}</span>
+                      <link.icon className="w-4 h-4" />
+                      <span>{link.label}</span>
                     </a>
                   );
                 })}

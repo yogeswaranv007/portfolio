@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://yogeswaran-v-portfolio-2005.vercel.app/sitemap.xml
+

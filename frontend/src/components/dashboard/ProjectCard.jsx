@@ -1,67 +1,122 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ExternalLink, Folder, ArrowRight } from 'lucide-react';
+import { ExternalLink, ArrowRight, Award, ShieldCheck } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { ProjectVisualPreview } from '../projects/ProjectVisualPreview';
 
-export function ProjectCard({ project, index }) {
+export function ProjectCard({ project }) {
+  const hasLiveLink = Boolean(project.liveUrl && project.liveUrl.trim().length > 0);
+  const hasCodeLink = Boolean(project.githubUrl && project.githubUrl.trim().length > 0);
+  const codeLabel = project.githubLabel || (project.id === 'mospi-survey' ? 'Team repository' : 'Source Code');
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1, duration: 0.4 }}
-      className="glass-card p-6 flex flex-col h-full group relative overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(37,99,235,0.15)] hover:border-primary/40"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      <div className="relative z-10 flex items-center justify-between mb-6 text-text/70">
-        <Folder className="w-10 h-10 text-primary/70 group-hover:text-primary transition-colors" />
-        <div className="flex gap-4 items-center">
-          {project.githubUrl && (
-            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="p-2 hover:bg-cards rounded-lg hover:text-primary transition-colors">
-              <FaGithub className="w-5 h-5" />
-            </a>
-          )}
-          {project.liveUrl && (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="p-2 hover:bg-cards rounded-lg hover:text-primary transition-colors">
-              <ExternalLink className="w-5 h-5" />
-            </a>
+    <article className="p-6 sm:p-7 rounded-2xl bg-cards border border-borders hover:border-primary/40 transition-all duration-200 shadow-sm flex flex-col justify-between space-y-5 group">
+      {/* 1. Header Row: Title, Badges */}
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {project.type && (
+              <span className="px-2.5 py-0.5 text-xs font-mono font-medium rounded-full bg-primary/10 text-primary border border-primary/20">
+                {project.type}
+              </span>
+            )}
+            {project.period && (
+              <span className="text-xs font-mono text-text-muted">
+                {project.period}
+              </span>
+            )}
+          </div>
+
+          {project.id === 'mospi-survey' && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 text-xs font-semibold">
+              <Award className="w-3.5 h-3.5" /> Top 25 Finalist
+            </span>
           )}
         </div>
+
+        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-text group-hover:text-primary transition-colors">
+          <Link to={`/projects/${project.id}`}>
+            {project.title}
+          </Link>
+        </h3>
+
+        <p className="text-xs sm:text-sm text-text-muted leading-relaxed font-normal">
+          {project.description}
+        </p>
       </div>
 
-      {project.id === 'mospi-survey' && (
-        <div className="relative z-10 inline-flex items-center gap-1.5 px-3 py-1 mb-4 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-xs font-bold self-start tracking-wide uppercase">
-          <span>🏆</span> National Grand Finalist
-        </div>
-      )}
+      {/* 2. Visual Centerpiece: Interactive App Preview & Architecture Diagram */}
+      <div className="pt-1">
+        <ProjectVisualPreview project={project} />
+      </div>
 
-      <h3 className="relative z-10 text-2xl font-bold text-text mb-3 group-hover:text-primary transition-colors">
-        {project.title}
-      </h3>
-      
-      <p className="relative z-10 text-sm text-text/70 flex-1 leading-relaxed mb-6 font-light">
-        {project.description}
-      </p>
+      {/* 3. Compact Key Highlights */}
+      <div className="space-y-4 pt-2">
+        {project.myRole && (
+          <div className="text-xs text-text bg-background/80 p-3 rounded-xl border border-borders/80">
+            <span className="font-semibold text-primary font-mono uppercase tracking-wide mr-1.5">
+              My Part:
+            </span>
+            <span className="text-text-muted font-normal">
+              {project.myRole}
+            </span>
+          </div>
+        )}
 
-      <div className="relative z-10 mt-auto space-y-6">
-        <ul className="flex flex-wrap gap-2 text-xs font-mono text-primary/80">
-          {project.technologies.slice(0, 4).map(tech => (
-            <li key={tech} className="px-2 py-1 bg-primary/10 rounded-md border border-primary/10 group-hover:border-primary/30 transition-colors">
+        {/* Tech Stack Chips */}
+        <div className="flex flex-wrap gap-1.5">
+          {project.technologies.slice(0, 6).map((tech) => (
+            <span
+              key={tech}
+              className="px-2 py-0.5 text-xs font-mono rounded bg-background text-text-muted border border-borders/70"
+            >
               {tech}
-            </li>
+            </span>
           ))}
-          {project.technologies.length > 4 && (
-            <li className="px-2 py-1 text-text/50">+{project.technologies.length - 4} more</li>
+          {project.technologies.length > 6 && (
+            <span className="px-2 py-0.5 text-xs font-mono rounded bg-background text-text-muted/60 border border-borders/40">
+              +{project.technologies.length - 6} more
+            </span>
           )}
-        </ul>
-        <a 
-          href={`/projects/${project.id}`} 
-          className="flex items-center justify-center gap-2 w-full py-3 bg-cards/80 border border-borders group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all rounded-xl font-semibold text-sm"
-        >
-          View Details <ArrowRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-        </a>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-borders/60">
+          <div className="flex flex-wrap items-center gap-2">
+            {hasLiveLink && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              >
+                <span>Live Demo</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+
+            {hasCodeLink && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-background hover:bg-cards border border-borders hover:border-primary/50 text-text text-xs font-medium transition-colors"
+                title={codeLabel}
+              >
+                <FaGithub className="w-3.5 h-3.5" />
+                <span>{codeLabel}</span>
+              </a>
+            )}
+          </div>
+
+          <Link
+            to={`/projects/${project.id}`}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover transition-colors font-mono"
+          >
+            <span>Specs &rarr;</span>
+          </Link>
+        </div>
       </div>
-    </motion.div>
+    </article>
   );
 }

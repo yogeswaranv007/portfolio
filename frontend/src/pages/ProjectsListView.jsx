@@ -1,102 +1,86 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { FolderGit2 } from 'lucide-react';
 import { ProjectCard } from '../components/dashboard/ProjectCard';
 import { portfolioService } from '../services/portfolioService';
-import { FolderGit2 } from 'lucide-react';
 
-const CATEGORIES = ['All', 'Java / Spring Boot', 'AI / ML', 'Cloud', 'Full Stack'];
+const CATEGORIES = ['All', 'Java / Spring Boot', 'AI Integrations', 'Full Stack'];
 
-const getProjectCategories = (project) => {
-  const cats = ['All'];
-  const techString = (project.technologies || []).join(' ').toLowerCase();
-  
-  if (techString.includes('java') || techString.includes('spring boot')) cats.push('Java / Spring Boot');
-  if (techString.includes('ai') || techString.includes('ml') || techString.includes('python') || techString.includes('fastapi') || techString.includes('groq')) cats.push('AI / ML');
-  if (techString.includes('aws') || techString.includes('azure') || techString.includes('cloud')) cats.push('Cloud');
-  if (techString.includes('react') && (techString.includes('node') || techString.includes('java') || techString.includes('python'))) cats.push('Full Stack');
-  
-  return cats;
+const matchesCategory = (project, category) => {
+  if (category === 'All') return true;
+  const tech = (project.technologies || []).join(' ').toLowerCase();
+  if (category === 'Java / Spring Boot') {
+    return tech.includes('java') || tech.includes('spring boot');
+  }
+  if (category === 'AI Integrations') {
+    return tech.includes('ai') || tech.includes('groq') || tech.includes('rag') || tech.includes('fastapi') || tech.includes('bhashini');
+  }
+  if (category === 'Full Stack') {
+    return tech.includes('react') && (tech.includes('node') || tech.includes('express') || tech.includes('spring'));
+  }
+  return true;
 };
 
 export function ProjectsListView() {
   const [activeFilter, setActiveFilter] = useState('All');
-  // Local-First: Immediate synchronous fallback hydration
   const [projectsData, setProjectsData] = useState(() => {
     const local = portfolioService.getLocalProjects();
-    return (local || []).filter(p => p.visible !== false);
+    return (local || []).filter((p) => p.visible !== false);
   });
 
   useEffect(() => {
     let isMounted = true;
     portfolioService.getProjects().then((data) => {
       if (isMounted && Array.isArray(data) && data.length > 0) {
-        setProjectsData(data.filter(p => p.visible !== false));
+        setProjectsData(data.filter((p) => p.visible !== false));
       }
     }).catch(() => {});
     return () => { isMounted = false; };
   }, []);
 
-  const filteredProjects = projectsData.filter(p => getProjectCategories(p).includes(activeFilter));
+  const filteredProjects = projectsData.filter((p) => matchesCategory(p, activeFilter));
 
   return (
-    <div className="space-y-10 pb-20">
-      <div className="space-y-6">
-        <motion.h1 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-extrabold tracking-tight text-text flex items-center gap-4"
-        >
-          <FolderGit2 className="w-10 h-10 text-primary" />
-          Engineering Projects
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-lg text-text/70 max-w-2xl font-light"
-        >
-          A collection of full-stack applications, microservices, and AI integrations I've built to solve real-world problems.
-        </motion.p>
-        
-        {/* Filters */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex flex-wrap gap-3 pt-4"
-        >
-          {CATEGORIES.map(category => (
+    <section className="space-y-8" id="projects">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
+            <FolderGit2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text">
+              Featured Projects
+            </h2>
+            <p className="text-xs sm:text-sm text-text-muted">
+              Production platforms, micro-services, and hackathon prototypes
+            </p>
+          </div>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex flex-wrap gap-1.5 bg-cards p-1 rounded-xl border border-borders self-start sm:self-auto">
+          {CATEGORIES.map((cat) => (
             <button
-              key={category}
-              onClick={() => setActiveFilter(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                activeFilter === category 
-                  ? 'bg-primary text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' 
-                  : 'bg-cards/50 border border-borders text-text/70 hover:text-text hover:border-primary/50 backdrop-blur-sm'
+              key={cat}
+              onClick={() => setActiveFilter(cat)}
+              className={`px-3 py-1 text-xs font-medium rounded-lg transition-all ${
+                activeFilter === cat
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-text-muted hover:text-text hover:bg-background'
               }`}
             >
-              {category}
+              {cat}
             </button>
           ))}
-        </motion.div>
+        </div>
       </div>
 
-      <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AnimatePresence mode="popLayout">
-          {filteredProjects.map((project, idx) => (
-            <motion.div
-              key={project.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ProjectCard project={project} index={idx} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
-    </div>
+      {/* Projects Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {filteredProjects.map((project) => (
+          <ProjectCard key={project.id} project={project} />
+        ))}
+      </div>
+    </section>
   );
 }

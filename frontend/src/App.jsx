@@ -1,9 +1,11 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { PublicLayout } from './components/layouts/PublicLayout';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 import { Cursor } from './components/ui/Cursor';
 import { Toaster } from 'react-hot-toast';
+
+const CinematicSpaceCanvas = lazy(() => import('./components/canvas/CinematicSpaceCanvas'));
 
 const DashboardView = lazy(() => import('./pages/DashboardView').then(module => ({ default: module.DashboardView })));
 const ProjectDetailView = lazy(() => import('./pages/ProjectDetailView').then(module => ({ default: module.ProjectDetailView })));
@@ -20,18 +22,20 @@ const AdminAchievements = lazy(() => import('./pages/admin/AdminAchievements').t
 const AdminCodingProfiles = lazy(() => import('./pages/admin/AdminCodingProfiles').then(module => ({ default: module.default })));
 const AdminMessages = lazy(() => import('./pages/admin/AdminMessages').then(module => ({ default: module.default })));
 
-// A wrapper component to provide useLocation to AnimatePresence if needed, 
-// but DashboardLayout already handles route transitions internally.
-// We just mount the Cursor globally here.
-
 function App() {
   return (
     <BrowserRouter>
-      <Toaster />
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          className: 'bg-cards text-text border border-borders shadow-lg text-xs font-medium',
+          duration: 4000,
+        }}
+      />
       <Cursor />
-      
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none z-[-2]"></div>
-      <div className="absolute left-0 right-0 top-0 -z-[2] m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]"></div>
+      <Suspense fallback={null}>
+        <CinematicSpaceCanvas />
+      </Suspense>
 
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>

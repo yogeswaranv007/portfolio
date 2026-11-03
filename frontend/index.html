@@ -1,16 +1,56 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Yogeswaran V | Software Engineer</title>
-    <meta name="description" content="Software Engineer specializing in Java Backend, React, and Full Stack Development. Final year B.Tech IT Student." />
-    <meta property="og:title" content="Yogeswaran V | Software Engineer" />
-    <meta property="og:description" content="Software Engineer specializing in Java Backend, React, and Full Stack Development." />
+    <title>Yogeswaran V | Java &amp; Full-Stack Developer</title>
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Yogeswaran V | Java &amp; Full-Stack Developer" />
+    <meta name="description" content="Final-year B.Tech IT student specializing in Java, Spring Boot, React, and AI/GenAI integrations. Builds secure, API-driven applications and RAG-based AI features." />
+    <meta name="keywords" content="Yogeswaran V, Java Developer, Spring Boot, React, Full-Stack Developer, AI integrations, RAG, Groq, PostgreSQL, Bannari Amman Institute of Technology" />
+    <meta name="author" content="Yogeswaran V" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://yogeswaran-v-portfolio-2005.vercel.app/" />
+
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yogeswaran-v-portfolio-2005.vercel.app/" />
+    <meta property="og:title" content="Yogeswaran V | Java &amp; Full-Stack Developer" />
+    <meta property="og:description" content="Final-year B.Tech IT student specializing in Java, Spring Boot, React, and AI/GenAI integrations. Builds secure, API-driven applications and RAG-based AI features." />
+    <meta property="og:image" content="https://yogeswaran-v-portfolio-2005.vercel.app/yoges_profile.jpeg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://yogeswaran-v-portfolio-2005.vercel.app/" />
+    <meta property="twitter:title" content="Yogeswaran V | Java &amp; Full-Stack Developer" />
+    <meta property="twitter:description" content="Final-year B.Tech IT student specializing in Java, Spring Boot, React, and AI/GenAI integrations. Builds secure, API-driven applications and RAG-based AI features." />
+    <meta property="twitter:image" content="https://yogeswaran-v-portfolio-2005.vercel.app/yoges_profile.jpeg" />
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Theme Initialization to Prevent FOUC -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+          } else {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-[#09090B] text-[#FAFAFA]">
+  <body class="bg-background text-text transition-colors duration-200 antialiased selection:bg-primary/30">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
