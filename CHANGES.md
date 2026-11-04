@@ -96,9 +96,25 @@
      - **AI Learning Roadmap Generator:** Displays a personalized roadmap UI with Groq LLaMA-3 generation badge (0.38s), 3 visual milestone phases, and day-by-day practice tasks. The architecture view details the `React` ➔ `Express API (JWT + refresh)` ➔ `Groq LLM (with fallback)` ➔ `MongoDB` flow.
      - **Battery Vehicle Booking System:** Displays an electric vehicle transit dispatch mockup with battery gauge (88% charged), route assignment, approval badge, and conflict detection status. The architecture view contrasts the live MERN deployment with the Spring Boot + TiDB relational migration branch.
 8. **Coding Profiles:**
-   - Updated to: LeetCode (`450+ Solved`), GitHub, LinkedIn, Codeforces, and CodeChef. Removed HackerRank and GeeksforGeeks.
+   - Updated to user verified coding profiles: **LeetCode** (450+ Solved), **GeeksforGeeks** (yogeswaranv), **CodeChef** (yogeswaran_v), and **HackerRank** (yogeswaranv599). Removed Codeforces.
 9. **Resume Placeholder:**
    - Configured `frontend/src/data/resume.json` with a clearly marked placeholder path (`/resume/PLACEHOLDER_RESUME_FILENAME.pdf`).
+10. **Hero Portrait Framing Overhaul & 3D Interactive Perspective Tilt:**
+    - Replaced raw uncropped 9:16 layout (which left empty blue space above head) with an executive **4:5 Golden Portrait Ratio** (`aspect-[4/5]` with `object-[center_22%]`), focusing naturally on the face, suit, collar, and shoulders.
+    - Integrated `<Tilt3DCard>` component: provides dynamic cursor perspective tilt (`rotateX`, `rotateY`), smooth spring physics return, and realistic specular radial light sheen.
+    - Added ambient dual-gradient backlight glow (warm solar amber in light mode, cosmic cyan/indigo in dark mode) and floating tech badges (`Java`, `Spring Boot`, `React`, `PostgreSQL`).
+11. **Comprehensive Alternating Slide Animations & 3D Tactile Functions:**
+    - Implemented alternating horizontal scroll-reveal entrances across all sections using `framer-motion` (`whileInView`, `viewport: { once: true, margin: '-60px' }`):
+      - **Hero:** Left text column slides in from **Left** (`x: -60 -> 0`); Right 3D portrait slides in from **Right** (`x: 60 -> 0`).
+      - **Quick Statistics:** Slides in from **Left** (`x: -50 -> 0`) with 5 individual 3D perspective tilt stat cards.
+      - **About Me:** Slides in from **Left** (`x: -50 -> 0`); 3 pillar cards wrapped in 3D tilt.
+      - **Technical Skills (TechRadar):** Slides in from **Right** (`x: 50 -> 0`); 7 category cards wrapped in 3D tilt with interactive chip hovers.
+      - **Featured Projects:** Alternating project card slide-in (Even indices from **Left**, Odd indices from **Right**) with `<Tilt3DCard>` tactile hover depth.
+      - **Experience & Education:** Experience timeline column slides in from **Left** (`x: -50 -> 0`); Education timeline column slides in from **Right** (`x: 50 -> 0`); milestone cards wrapped in 3D tilt with glowing track nodes.
+      - **Journey & Achievements:** Timeline header and year pills slide in from **Right** (`x: 50 -> 0`); milestones alternate in with 3D tilt cards.
+      - **Coding Profiles:** Slides in from **Left** (`x: -50 -> 0`); LeetCode, GeeksforGeeks, HackerRank, and CodeChef cards wrapped in 3D tilt.
+      - **Contact Section:** Contact details slide in from **Left** (`x: -50 -> 0`); Direct Message form slides in from **Right** (`x: 50 -> 0`).
+    - All animations are GPU accelerated (`transform-gpu`) and respect `prefers-reduced-motion` for accessibility.
 
 ---
 

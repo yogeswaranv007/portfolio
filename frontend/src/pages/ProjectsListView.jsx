@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { FolderGit2 } from 'lucide-react';
 import { ProjectCard } from '../components/dashboard/ProjectCard';
 import { portfolioService } from '../services/portfolioService';
@@ -40,9 +41,15 @@ export function ProjectsListView() {
   const filteredProjects = projectsData.filter((p) => matchesCategory(p, activeFilter));
 
   return (
-    <section className="space-y-8" id="projects">
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <section className="space-y-8 overflow-hidden" id="projects">
+      {/* Section Header (Slides in from Left) */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transform-gpu"
+      >
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
             <FolderGit2 className="w-5 h-5" />
@@ -58,7 +65,7 @@ export function ProjectsListView() {
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap gap-1.5 bg-cards p-1 rounded-xl border border-borders self-start sm:self-auto">
+        <div className="flex flex-wrap gap-1.5 bg-cards p-1 rounded-xl border border-borders self-start sm:self-auto shadow-sm">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -73,13 +80,25 @@ export function ProjectsListView() {
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Projects Grid */}
+      {/* Projects Grid: Alternating Slide-ins (Even from Left, Odd from Right) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredProjects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
+        {filteredProjects.map((project, idx) => {
+          const slideFromLeft = idx % 2 === 0;
+          return (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, x: slideFromLeft ? -50 : 50, y: 20 }}
+              whileInView={{ opacity: 1, x: 0, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, delay: (idx % 2) * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full transform-gpu"
+            >
+              <ProjectCard project={project} />
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

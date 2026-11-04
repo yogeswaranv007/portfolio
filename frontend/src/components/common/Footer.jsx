@@ -1,7 +1,7 @@
 import React from 'react';
 import { Mail, ArrowUp } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
-import { SiLeetcode, SiCodeforces, SiCodechef } from 'react-icons/si';
+import { SiLeetcode, SiCodechef, SiHackerrank, SiGeeksforgeeks } from 'react-icons/si';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -54,13 +54,13 @@ export function Footer() {
               <SiLeetcode className="w-4 h-4" />
             </a>
             <a
-              href="https://codeforces.com/profile/yogeswaranv"
+              href="https://www.geeksforgeeks.org/profile/yogeswaranv"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg border border-borders bg-cards hover:border-primary/50 text-text-muted hover:text-[#1F8ACB] transition-colors"
-              aria-label="Codeforces Profile"
+              className="p-2 rounded-lg border border-borders bg-cards hover:border-primary/50 text-text-muted hover:text-[#2F8D46] transition-colors"
+              aria-label="GeeksforGeeks Profile"
             >
-              <SiCodeforces className="w-4 h-4" />
+              <SiGeeksforgeeks className="w-4 h-4" />
             </a>
             <a
               href="https://www.codechef.com/users/yogeswaran_v"
@@ -70,6 +70,15 @@ export function Footer() {
               aria-label="CodeChef Profile"
             >
               <SiCodechef className="w-4 h-4" />
+            </a>
+            <a
+              href="https://www.hackerrank.com/profile/yogeswaranv599"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg border border-borders bg-cards hover:border-primary/50 text-text-muted hover:text-[#00EA64] transition-colors"
+              aria-label="HackerRank Profile"
+            >
+              <SiHackerrank className="w-4 h-4" />
             </a>
             <a
               href="mailto:yogeswaranv599@gmail.com"

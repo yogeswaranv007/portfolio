@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Layers } from 'lucide-react';
 import { portfolioService } from '../../services/portfolioService';
+import { Tilt3DCard } from '../ui/Tilt3DCard';
 
 const PREFERRED_GROUP_ORDER = [
   'Languages',
@@ -49,9 +51,15 @@ export function TechRadar() {
   });
 
   return (
-    <section className="space-y-8" id="skills">
-      {/* Section Header */}
-      <div className="flex items-center gap-3">
+    <section className="space-y-8 overflow-hidden" id="skills">
+      {/* Section Header (Slides in from Right) */}
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="flex items-center gap-3 transform-gpu"
+      >
         <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
           <Layers className="w-5 h-5" />
         </div>
@@ -63,38 +71,50 @@ export function TechRadar() {
             Grouped technologies and core competencies
           </p>
         </div>
-      </div>
+      </motion.div>
 
+      {/* Grid of 3D Tilt Skill Cards (Slides in from Right with stagger) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {orderedCategories.map((category) => {
+        {orderedCategories.map((category, idx) => {
           const skills = skillsData[category] || [];
           return (
-            <div
+            <motion.div
               key={category}
-              className="p-5 rounded-2xl bg-cards border border-borders hover:border-primary/40 transition-all duration-200 shadow-sm flex flex-col justify-between"
+              initial={{ opacity: 0, x: 40, y: 15 }}
+              whileInView={{ opacity: 1, x: 0, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: idx * 0.07, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full transform-gpu"
             >
-              <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <h3 className="text-sm font-semibold text-text uppercase tracking-wider font-mono">
-                    {category}
-                  </h3>
-                  <span className="text-xs font-mono text-text-muted bg-background px-2 py-0.5 rounded border border-borders">
-                    {skills.length}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2.5 py-1 text-xs font-mono font-medium rounded-lg bg-background text-text border border-borders hover:border-primary/50 hover:text-primary transition-colors cursor-default"
-                    >
-                      {skill}
+              <Tilt3DCard
+                maxTilt={6}
+                scale={1.02}
+                glare={true}
+                className="h-full p-5 rounded-2xl bg-cards border border-borders hover:border-primary/50 transition-colors shadow-sm flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3.5">
+                    <h3 className="text-sm font-semibold text-text uppercase tracking-wider font-mono group-hover:text-primary transition-colors">
+                      {category}
+                    </h3>
+                    <span className="text-xs font-mono text-text-muted bg-background px-2 py-0.5 rounded border border-borders">
+                      {skills.length}
                     </span>
-                  ))}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-2.5 py-1 text-xs font-mono font-medium rounded-lg bg-background text-text border border-borders hover:border-primary/50 hover:text-primary transition-all cursor-default select-none hover:scale-105"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </Tilt3DCard>
+            </motion.div>
           );
         })}
       </div>

@@ -4,27 +4,27 @@
     "username": "Yogeswaran_v",
     "url": "https://leetcode.com/u/Yogeswaran_v/",
     "metrics": "450+ Solved",
-    "icon": "code"
+    "icon": "leetcode"
   },
   {
-    "platform": "Codeforces",
+    "platform": "GeeksforGeeks",
     "username": "yogeswaranv",
-    "url": "https://codeforces.com/profile/yogeswaranv",
-    "metrics": "Competitive Programming",
-    "icon": "terminal"
+    "url": "https://www.geeksforgeeks.org/profile/yogeswaranv",
+    "metrics": "Problem Solving & Practice",
+    "icon": "geeksforgeeks"
   },
   {
     "platform": "CodeChef",
     "username": "yogeswaran_v",
     "url": "https://www.codechef.com/users/yogeswaran_v",
     "metrics": "Problem Solving",
-    "icon": "code"
+    "icon": "codechef"
   },
   {
-    "platform": "GitHub",
-    "username": "yogeswaranv007",
-    "url": "https://github.com/yogeswaranv007",
-    "metrics": "Open Source & Projects",
-    "icon": "git"
+    "platform": "HackerRank",
+    "username": "yogeswaranv599",
+    "url": "https://www.hackerrank.com/profile/yogeswaranv599",
+    "metrics": "Problem Solving & Badges",
+    "icon": "hackerrank"
   }
 ]

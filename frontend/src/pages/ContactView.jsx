@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Mail, MapPin, Send, AlertCircle, CheckCircle2, ExternalLink, Copy, Check, Clock } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
-import { SiLeetcode, SiCodeforces, SiCodechef } from 'react-icons/si';
+import { SiLeetcode, SiCodechef, SiHackerrank, SiGeeksforgeeks } from 'react-icons/si';
 import toast from 'react-hot-toast';
 import { portfolioService } from '../services/portfolioService';
+import { Tilt3DCard } from '../components/ui/Tilt3DCard';
 
 const RATE_LIMIT_SECONDS = 30;
 
@@ -107,9 +109,15 @@ export default function ContactView() {
   )}`;
 
   return (
-    <section className="space-y-10" id="contact">
-      {/* Section Header */}
-      <div className="flex items-center gap-3">
+    <section className="space-y-10 overflow-hidden" id="contact">
+      {/* Section Header (Slides in from Right) */}
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="flex items-center gap-3 transform-gpu"
+      >
         <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
           <Mail className="w-5 h-5" />
         </div>
@@ -121,251 +129,281 @@ export default function ContactView() {
             Open to fresher &amp; intern roles at product and startup companies, and freelance opportunities.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Contact Info Column */}
-        <div className="lg:col-span-5 space-y-5">
-          {/* Email Card */}
-          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider">
-                Direct Email
-              </span>
-              <button
-                onClick={handleCopyEmail}
-                type="button"
-                className="p-1.5 rounded-lg border border-borders hover:border-primary/50 text-text-muted hover:text-text text-xs flex items-center gap-1 transition-colors"
-                title="Copy email to clipboard"
+        {/* Left Column: Contact Info (Slides in from Left) */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="lg:col-span-5 space-y-5 transform-gpu"
+        >
+          {/* Email Card with 3D Tilt */}
+          <Tilt3DCard maxTilt={5} scale={1.02} glare={true} className="rounded-2xl">
+            <div className="p-6 rounded-2xl bg-cards border border-borders space-y-4 shadow-sm group hover:border-primary/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider">
+                  Direct Email
+                </span>
+                <button
+                  onClick={handleCopyEmail}
+                  type="button"
+                  className="p-1.5 rounded-lg border border-borders hover:border-primary/50 text-text-muted hover:text-text text-xs flex items-center gap-1 transition-colors"
+                  title="Copy email to clipboard"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied' : 'Copy'}</span>
+                </button>
+              </div>
+
+              <a
+                href={`mailto:${recipientEmail}`}
+                className="text-base sm:text-lg font-bold text-text hover:text-primary transition-colors block break-all font-mono"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied' : 'Copy'}</span>
-              </button>
+                {recipientEmail}
+              </a>
+
+              <p className="text-xs text-text-muted leading-relaxed">
+                Feel free to reach out regarding engineering roles, technical collaboration, or inquiries.
+              </p>
             </div>
-
-            <a
-              href={`mailto:${recipientEmail}`}
-              className="text-base sm:text-lg font-bold text-text hover:text-primary transition-colors block break-all font-mono"
-            >
-              {recipientEmail}
-            </a>
-
-            <p className="text-xs text-text-muted leading-relaxed">
-              Feel free to reach out regarding engineering roles, technical collaboration, or inquiries.
-            </p>
-          </div>
+          </Tilt3DCard>
 
           {/* Location & Status Card */}
-          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-3 shadow-sm">
-            <div className="flex items-center gap-2 text-text font-semibold text-sm">
-              <MapPin className="w-4 h-4 text-primary" />
-              <span>Location: {profileData.location || 'Tamil Nadu, India'}</span>
+          <Tilt3DCard maxTilt={4} scale={1.01} glare={true} className="rounded-2xl">
+            <div className="p-6 rounded-2xl bg-cards border border-borders space-y-3 shadow-sm group hover:border-primary/50 transition-colors">
+              <div className="flex items-center gap-2 text-text font-semibold text-sm">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span>Location: {profileData.location || 'Tamil Nadu, India'}</span>
+              </div>
+              <p className="text-xs text-text-muted leading-relaxed">
+                Open to: fresher and intern roles in software development and AI at product and startup companies. Also available for freelance work.
+              </p>
             </div>
-            <p className="text-xs text-text-muted leading-relaxed">
-              Open to: fresher and intern roles in software development and AI at product and startup companies. Also available for freelance work.
-            </p>
-          </div>
+          </Tilt3DCard>
 
           {/* Professional Profiles */}
-          <div className="p-6 rounded-2xl bg-cards border border-borders space-y-3 shadow-sm">
-            <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider block">
-              Professional Profiles
-            </span>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <a
-                href="https://github.com/yogeswaranv007"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
-              >
-                <FaGithub className="w-4 h-4" />
-                <span>GitHub</span>
-              </a>
-              <a
-                href="https://www.linkedin.com/in/yogeswaranv"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
-              >
-                <FaLinkedin className="w-4 h-4 text-[#0A66C2]" />
-                <span>LinkedIn</span>
-              </a>
-              <a
-                href="https://leetcode.com/u/Yogeswaran_v/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
-              >
-                <SiLeetcode className="w-4 h-4 text-[#FFA116]" />
-                <span>LeetCode</span>
-              </a>
-              <a
-                href="https://codeforces.com/profile/yogeswaranv"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-colors"
-              >
-                <SiCodeforces className="w-4 h-4 text-[#1F8ACB]" />
-                <span>Codeforces</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Contact Form Column */}
-        <div className="lg:col-span-7">
-          <form
-            onSubmit={handleSubmit}
-            className="p-6 sm:p-8 rounded-2xl bg-cards border border-borders shadow-sm space-y-5"
-          >
-            <h3 className="text-lg font-bold text-text">
-              Send a Direct Message
-            </h3>
-
-            {/* Success Banner */}
-            {submitStatus === 'success' && (
-              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold">Message delivered successfully!</p>
-                  <p className="text-xs text-text-muted mt-0.5">Thank you for getting in touch. I will respond to your email as soon as possible.</p>
-                </div>
+          <Tilt3DCard maxTilt={4} scale={1.01} glare={true} className="rounded-2xl">
+            <div className="p-6 rounded-2xl bg-cards border border-borders space-y-3 shadow-sm">
+              <span className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider block">
+                Professional Profiles
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <a
+                  href="https://github.com/yogeswaranv007"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-all hover:scale-105"
+                >
+                  <FaGithub className="w-4 h-4" />
+                  <span>GitHub</span>
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/yogeswaranv"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-all hover:scale-105"
+                >
+                  <FaLinkedin className="w-4 h-4 text-[#0A66C2]" />
+                  <span>LinkedIn</span>
+                </a>
+                <a
+                  href="https://leetcode.com/u/Yogeswaran_v/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-all hover:scale-105"
+                >
+                  <SiLeetcode className="w-4 h-4 text-[#FFA116]" />
+                  <span>LeetCode</span>
+                </a>
+                <a
+                  href="https://www.geeksforgeeks.org/profile/yogeswaranv"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-all hover:scale-105"
+                >
+                  <SiGeeksforgeeks className="w-4 h-4 text-[#2F8D46]" />
+                  <span>GeeksforGeeks</span>
+                </a>
+                <a
+                  href="https://www.hackerrank.com/profile/yogeswaranv599"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-all hover:scale-105"
+                >
+                  <SiHackerrank className="w-4 h-4 text-[#00EA64]" />
+                  <span>HackerRank</span>
+                </a>
+                <a
+                  href="https://www.codechef.com/users/yogeswaran_v"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-background border border-borders hover:border-primary/50 text-text flex items-center gap-2 transition-all hover:scale-105"
+                >
+                  <SiCodechef className="w-4 h-4 text-primary" />
+                  <span>CodeChef</span>
+                </a>
               </div>
-            )}
+            </div>
+          </Tilt3DCard>
+        </motion.div>
 
-            {/* Fallback Banner (when backend is unreachable) */}
-            {submitStatus === 'fallback' && (
-              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs sm:text-sm space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+        {/* Right Column: Contact Form (Slides in from Right) */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className="lg:col-span-7 transform-gpu"
+        >
+          <Tilt3DCard maxTilt={3} scale={1.005} glare={false} className="rounded-2xl">
+            <form
+              onSubmit={handleSubmit}
+              className="p-6 sm:p-8 rounded-2xl bg-cards border border-borders shadow-sm space-y-5"
+            >
+              <h3 className="text-lg font-bold text-text">
+                Send a Direct Message
+              </h3>
+
+              {/* Status alerts */}
+              {submitStatus === 'success' && (
+                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold">Server response timed out</p>
-                    <p className="text-xs text-text-muted mt-0.5">
-                      The automated email service is currently unavailable. Please click below to send via your local email client instead.
-                    </p>
+                    <span className="font-semibold block mb-0.5">Message delivered</span>
+                    Thank you! Your message has been routed to my inbox. I will reply soon.
                   </div>
                 </div>
-                <div className="pt-1">
+              )}
+
+              {submitStatus === 'fallback' && (
+                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs space-y-2">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-semibold block mb-0.5">Backend Service Unavailable</span>
+                      The API server is currently offline. Please click below to send your pre-filled email directly via your mail client:
+                    </div>
+                  </div>
                   <a
                     href={mailtoUrl}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors"
                   >
-                    <Mail className="w-3.5 h-3.5" />
-                    <span>Open in Email Client</span>
-                    <ExternalLink className="w-3 h-3" />
+                    <span>Open in Email App</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              </div>
-            )}
-
-            {/* Name Input */}
-            <div className="space-y-1">
-              <label htmlFor="contact-name" className="block text-xs font-mono font-medium text-text">
-                Your Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="contact-name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="e.g. Alex Smith"
-                className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors ${
-                  errors.name ? 'border-red-500' : 'border-borders'
-                }`}
-              />
-              {errors.name && (
-                <p className="text-xs text-red-500 font-mono mt-1">{errors.name}</p>
               )}
-            </div>
 
-            {/* Email Input */}
-            <div className="space-y-1">
-              <label htmlFor="contact-email" className="block text-xs font-mono font-medium text-text">
-                Your Email Address <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="contact-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="e.g. alex@company.com"
-                className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors ${
-                  errors.email ? 'border-red-500' : 'border-borders'
-                }`}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-500 font-mono mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Subject Input */}
-            <div className="space-y-1">
-              <label htmlFor="contact-subject" className="block text-xs font-mono font-medium text-text">
-                Subject
-              </label>
-              <input
-                id="contact-subject"
-                name="subject"
-                type="text"
-                value={formData.subject}
-                onChange={handleChange}
-                placeholder="e.g. Opportunity / Software Engineering Role"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-borders text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
-              />
-            </div>
-
-            {/* Message Input */}
-            <div className="space-y-1">
-              <label htmlFor="contact-message" className="block text-xs font-mono font-medium text-text">
-                Message <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                id="contact-message"
-                name="message"
-                rows={4}
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Tell me about the role, project, or question..."
-                className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors resize-none ${
-                  errors.message ? 'border-red-500' : 'border-borders'
-                }`}
-              />
-              {errors.message && (
-                <p className="text-xs text-red-500 font-mono mt-1">{errors.message}</p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-2 flex items-center justify-between">
-              <span className="text-xs text-text-muted flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                Rate limited (30s)
-              </span>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-sm font-semibold transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                    <span>Sending...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Send Message</span>
-                  </>
+              {/* Name field */}
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="text-xs font-mono font-medium text-text block">
+                  Your Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="e.g. Aditi Sharma"
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors ${
+                    errors.name ? 'border-red-500' : 'border-borders'
+                  }`}
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500 font-mono mt-1">{errors.name}</p>
                 )}
-              </button>
-            </div>
-          </form>
-        </div>
+              </div>
+
+              {/* Email field */}
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="text-xs font-mono font-medium text-text block">
+                  Your Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="e.g. aditi@company.com"
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors ${
+                    errors.email ? 'border-red-500' : 'border-borders'
+                  }`}
+                />
+                {errors.email && (
+                  <p className="text-xs text-red-500 font-mono mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              {/* Subject field */}
+              <div className="space-y-1.5">
+                <label htmlFor="subject" className="text-xs font-mono font-medium text-text block">
+                  Subject <span className="text-text-muted">(Optional)</span>
+                </label>
+                <input
+                  id="subject"
+                  name="subject"
+                  type="text"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  placeholder="e.g. Backend Engineering Opportunity"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-borders text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
+                />
+              </div>
+
+              {/* Message field */}
+              <div className="space-y-1.5">
+                <label htmlFor="message" className="text-xs font-mono font-medium text-text block">
+                  Message <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={5}
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Tell me about the role, project, or question..."
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-background border text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors resize-none ${
+                    errors.message ? 'border-red-500' : 'border-borders'
+                  }`}
+                />
+                {errors.message && (
+                  <p className="text-xs text-red-500 font-mono mt-1">{errors.message}</p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-2 flex items-center justify-between">
+                <span className="text-xs text-text-muted flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  Rate limited (30s)
+                </span>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-sm font-semibold transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>Send Message</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </Tilt3DCard>
+        </motion.div>
       </div>
     </section>
   );

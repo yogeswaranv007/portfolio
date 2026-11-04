@@ -20,8 +20,9 @@ Focuses on backend and full-stack product engineering. Builds secure, API-driven
 - **GitHub:** [https://github.com/yogeswaranv007](https://github.com/yogeswaranv007)
 - **LinkedIn:** [https://www.linkedin.com/in/yogeswaranv](https://www.linkedin.com/in/yogeswaranv)
 - **LeetCode:** [https://leetcode.com/u/Yogeswaran_v/](https://leetcode.com/u/Yogeswaran_v/) (450+ Solved)
-- **Codeforces:** [https://codeforces.com/profile/yogeswaranv](https://codeforces.com/profile/yogeswaranv)
+- **GeeksforGeeks:** [https://www.geeksforgeeks.org/profile/yogeswaranv](https://www.geeksforgeeks.org/profile/yogeswaranv)
 - **CodeChef:** [https://www.codechef.com/users/yogeswaran_v](https://www.codechef.com/users/yogeswaran_v)
+- **HackerRank:** [https://www.hackerrank.com/profile/yogeswaranv599](https://www.hackerrank.com/profile/yogeswaranv599)
 
 ---
 

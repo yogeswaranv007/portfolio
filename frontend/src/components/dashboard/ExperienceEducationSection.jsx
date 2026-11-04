@@ -1,43 +1,59 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { GraduationCap, Briefcase, BookOpen } from 'lucide-react';
+import { Tilt3DCard } from '../ui/Tilt3DCard';
 import data from '../../data/educationExperience.json';
 
 export function ExperienceEducationSection() {
   const { experience, education } = data;
 
   return (
-    <section className="space-y-10" id="experience-education">
-      <div className="flex items-center gap-3 text-text">
-        <GraduationCap className="w-8 h-8 text-primary" />
-        <h2 className="text-3xl font-bold tracking-tight">Experience &amp; Education</h2>
-      </div>
+    <section className="space-y-10 overflow-hidden" id="experience-education">
+      {/* Section Header (Slides in from Left) */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="flex items-center gap-3 text-text transform-gpu"
+      >
+        <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
+          <GraduationCap className="w-6 h-6" />
+        </div>
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Experience &amp; Education</h2>
+          <p className="text-xs sm:text-sm text-text-muted">Verified teaching experience and academic credentials</p>
+        </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-14 items-start">
-        {/* Experience Timeline Track */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2.5 text-text font-bold text-xl pb-2 border-b border-borders/50">
-            <Briefcase className="w-5 h-5 text-primary" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 items-start">
+        {/* Left Column: Experience (Slides in from Left) */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="space-y-6 transform-gpu"
+        >
+          <div className="flex items-center gap-2.5 text-text font-bold text-xl pb-1">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <Briefcase className="w-4 h-4" />
+            </div>
             <h3>Experience</h3>
           </div>
 
-          <div className="relative pl-6 md:pl-10 border-l-2 border-borders/50 space-y-10">
+          <div className="space-y-5">
             {experience.map((item, index) => (
-              <motion.div
+              <Tilt3DCard
                 key={item.id || index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ delay: index * 0.1, type: 'spring', stiffness: 200, damping: 20 }}
-                className="relative group"
+                maxTilt={5}
+                scale={1.02}
+                glare={true}
+                className="rounded-2xl"
               >
-                {/* Glowing Node on Track */}
-                <div className="absolute -left-[35px] md:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-background border-4 border-primary/50 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(37,99,235,0.6)] transition-all duration-300 z-10" />
-
-                <div className="flex flex-col gap-2.5 p-6 glass-card rounded-2xl group-hover:-translate-y-1 group-hover:border-primary/40 transition-all duration-300">
+                <div className="flex flex-col gap-3 p-6 glass-card rounded-2xl group hover:border-primary/50 transition-colors duration-300 shadow-sm">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-primary tracking-widest uppercase flex items-center gap-2 font-mono">
-                      <span className="w-8 h-[1px] bg-primary/50 hidden md:block" />
+                    <span className="px-2.5 py-1 text-xs font-mono font-bold rounded-lg bg-primary/10 text-primary border border-primary/20 tracking-wide">
                       {item.period}
                     </span>
                     <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium rounded-full bg-primary/10 text-primary border border-primary/20">
@@ -54,11 +70,11 @@ export function ExperienceEducationSection() {
                     </p>
                   </div>
 
-                  <p className="text-sm md:text-base text-text-muted leading-relaxed font-light mt-1">
+                  <p className="text-sm md:text-base text-text-muted leading-relaxed font-light">
                     {item.description}
                   </p>
                 </div>
-              </motion.div>
+              </Tilt3DCard>
             ))}
 
             {/* Note on formal internships */}
@@ -66,32 +82,35 @@ export function ExperienceEducationSection() {
               <span className="font-semibold text-text">Note:</span> No formal internships held to date. Actively seeking fresher and intern software development roles.
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Education Timeline Track */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2.5 text-text font-bold text-xl pb-2 border-b border-borders/50">
-            <GraduationCap className="w-5 h-5 text-primary" />
+        {/* Right Column: Education (Slides in from Right) */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className="space-y-6 transform-gpu"
+        >
+          <div className="flex items-center gap-2.5 text-text font-bold text-xl pb-1">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <GraduationCap className="w-4 h-4" />
+            </div>
             <h3>Education</h3>
           </div>
 
-          <div className="relative pl-6 md:pl-10 border-l-2 border-borders/50 space-y-10">
+          <div className="space-y-5">
             {education.map((item, index) => (
-              <motion.div
+              <Tilt3DCard
                 key={item.id || index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ delay: index * 0.1, type: 'spring', stiffness: 200, damping: 20 }}
-                className="relative group"
+                maxTilt={5}
+                scale={1.02}
+                glare={true}
+                className="rounded-2xl"
               >
-                {/* Glowing Node on Track */}
-                <div className="absolute -left-[35px] md:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-background border-4 border-primary/50 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(37,99,235,0.6)] transition-all duration-300 z-10" />
-
-                <div className="flex flex-col gap-2.5 p-6 glass-card rounded-2xl group-hover:-translate-y-1 group-hover:border-primary/40 transition-all duration-300">
+                <div className="flex flex-col gap-3 p-6 glass-card rounded-2xl group hover:border-primary/50 transition-colors duration-300 shadow-sm">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-primary tracking-widest uppercase flex items-center gap-2 font-mono">
-                      <span className="w-8 h-[1px] bg-primary/50 hidden md:block" />
+                    <span className="px-2.5 py-1 text-xs font-mono font-bold rounded-lg bg-primary/10 text-primary border border-primary/20 tracking-wide">
                       {item.period}
                     </span>
                     <span className="px-2.5 py-0.5 text-xs font-mono font-bold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
@@ -109,7 +128,7 @@ export function ExperienceEducationSection() {
                   </div>
 
                   {Array.isArray(item.coursework) && item.coursework.length > 0 && (
-                    <div className="pt-2 border-t border-borders/50 mt-1">
+                    <div className="pt-2 border-t border-borders/40 mt-1">
                       <p className="text-xs font-mono text-text-muted mb-2 flex items-center gap-1.5">
                         <BookOpen className="w-3.5 h-3.5 text-primary" />
                         <span>Key Coursework:</span>
@@ -127,10 +146,10 @@ export function ExperienceEducationSection() {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </Tilt3DCard>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
